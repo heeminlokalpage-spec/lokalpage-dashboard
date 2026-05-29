@@ -596,107 +596,105 @@ html, body {
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzdhZtnKqaeZfp7D2mTNExRHiY9p7Qiw_3vAEeoU9dH4OZ213fVI5c_ZhUnCCzgPl1q/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzWtC8YAIeITt8dWgW-Qzgew6cgnXoqHTFrRpqIS-s3Tiyahf4iCPjIdsTUsVdGXj8dHg/exec";
 const CITIES = ['Cebu','Bohol','Bali'];
 const COL  = { Cebu:'#2563EB', Bohol:'#16A34A', Bali:'#EA580C' };
 const COLL = { Cebu:'#EFF6FF', Bohol:'#F0FDF4', Bali:'#FFF7ED' };
 const CLS  = { Cebu:'cebu', Bohol:'bohol', Bali:'bali' };
 
-function cityOf(name){
-  if(!name) return null;
-  const n=String(name);
-  if(n.includes('발리'))  return 'Bali';
-  if(n.includes('보홀'))  return 'Bohol';
-  if(n.includes('세부'))  return 'Cebu';
-  if(/bali/i.test(n))    return 'Bali';
-  if(/bohol/i.test(n))   return 'Bohol';
-  if(/cebu/i.test(n))    return 'Cebu';
-  return null;
-}
-function toKST(v){
-  if(!v) return '';
-  const s=String(v);
-  if(s.includes('T')){
-    const d=new Date(s);
-    return new Date(d.getTime()+9*3600000).toISOString().slice(0,10);
-  }
-  return s.slice(0,10);
-}
+// ── pivot 시트 데이터 정규화 ──
+// 컬럼 순서: date | 세부(count,guest,review) | 발리(count,guest,review) | 보홀(count,guest,review)
 function normalize(raw){
-  return raw.map(r=>({
-    start_date: toKST(r['start_date']),
-    city:       cityOf(r['tpcc.name']||r['city']||''),
-    state:      String(r['state']||''),
-    amt:        Number(r['product_option_amount'])||0,
-    reviewed:   (r['is_reviewed']==='true'||r['is_reviewed']===true||Number(r['is_reviewed'])>0)?1:0,
-  })).filter(r=>r.city&&r.start_date&&r.start_date.length===10);
+  return raw
+    .filter(r => r['date'] && String(r['date']).length === 10)
+    .map(r => ({
+      date:         String(r['date']),
+      cebu_book:    Number(r['cebu_book'])||0,
+      cebu_guest:   Number(r['cebu_guest'])||0,
+      cebu_review:  Number(r['cebu_review'])||0,
+      bali_book:    Number(r['bali_book'])||0,
+      bali_guest:   Number(r['bali_guest'])||0,
+      bali_review:  Number(r['bali_review'])||0,
+      bohol_book:   Number(r['bohol_book'])||0,
+      bohol_guest:  Number(r['bohol_guest'])||0,
+      bohol_review: Number(r['bohol_review'])||0,
+    }));
 }
 
 function sample(){
   const today=new Date(); today.setHours(0,0,0,0);
-  const rows=[]; const st=['COMPLETED','COMPLETED','COMPLETED','PENDING','CANCELLED'];
-  CITIES.forEach(c=>{
-    const base={Cebu:7,Bohol:4,Bali:5}[c];
-    for(let d=0;d<185;d++){
-      const dt=new Date(today); dt.setDate(today.getDate()-d);
-      const ds=dt.toISOString().slice(0,10);
-      const n=Math.max(0,Math.round(base+(Math.random()-.38)*4));
-      for(let i=0;i<n;i++) rows.push({
-        start_date:ds,city:c,
-        state:st[Math.floor(Math.random()*st.length)],
-        amt:Math.floor(Math.random()*4+1),
-        reviewed:Math.random()>.62?1:0
-      });
-    }
-  });
+  const rows=[];
+  for(let i=59;i>=0;i--){
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    rows.push({
+      date: d.toISOString().slice(0,10),
+      cebu_book:  Math.floor(Math.random()*10+5),
+      cebu_guest: Math.floor(Math.random()*20+10),
+      bohol_book: Math.floor(Math.random()*8+3),
+      bohol_guest:Math.floor(Math.random()*15+8),
+      bali_book:  Math.floor(Math.random()*7+3),
+      bali_guest: Math.floor(Math.random()*12+5),
+    });
+  }
   return rows;
 }
 
 function process(rows){
-  const today=new Date(); today.setHours(0,0,0,0);
-  const ok=rows.filter(r=>r.state==='COMPLETED');
-  const ago=n=>{const d=new Date(today);d.setDate(today.getDate()-n);return d;};
-  const rng=(d,f,t)=>d.filter(r=>{const x=new Date(r.start_date);return x>=f&&x<=t;});
-  const r7=rng(ok,ago(6),today), r7p=rng(ok,ago(13),ago(7));
-  const r30=rng(ok,ago(29),today), r30p=rng(ok,ago(59),ago(30));
+  const today = new Date(); today.setHours(0,0,0,0);
+  const ago = n => { const d=new Date(today); d.setDate(today.getDate()-n); return d; };
 
-  const stats={};
-  CITIES.forEach(c=>{
-    const a=r7.filter(r=>r.city===c), b=r7p.filter(r=>r.city===c);
-    stats[c]={
-      bookings:a.length, guests:a.reduce((s,r)=>s+r.amt,0),
-      rate:a.length?Math.round(a.filter(r=>r.reviewed).length/a.length*100):0,
-      pb:b.length, pg:b.reduce((s,r)=>s+r.amt,0)
-    };
-  });
+  // 날짜 범위 필터 (문자열 비교로 정확하게)
+  const fmt = d => d.toISOString().slice(0,10);
+  const rng = (f,t) => rows.filter(r => r.date >= fmt(f) && r.date <= fmt(t));
 
-  // 30-day agg per city
-  const agg30={};
-  CITIES.forEach(c=>{
-    const a=r30.filter(r=>r.city===c), b=r30p.filter(r=>r.city===c);
-    agg30[c]={
-      bookings:a.length, guests:a.reduce((s,r)=>s+r.amt,0),
-      pb:b.length
-    };
-  });
+  // 오늘 제외, 어제~7일전 = ago(7) ~ ago(1)
+  const yesterday = ago(1);
+  const r7  = rng(ago(7), yesterday);   // 5/22 ~ 5/28
+  const r7p = rng(ago(14), ago(8));     // 5/15 ~ 5/21 (직전 7일)
+  const r30 = rng(ago(30), yesterday);  // 4/29 ~ 5/28
+  const r30p= rng(ago(60), ago(31));    // 3/30 ~ 4/28
 
-  const lbl30=[]; const d30={Cebu:[],Bohol:[],Bali:[]};
+  // 합산 헬퍼
+  const sum = (arr, key) => arr.reduce((s,r) => s + (r[key]||0), 0);
+
+  const pct = (rev, book) => book > 0 ? Math.round(rev/book*100) : 0;
+  const stats = {
+    Cebu:  { bookings: sum(r7,'cebu_book'),  guests: sum(r7,'cebu_guest'),  pb: sum(r7p,'cebu_book'),  pg: sum(r7p,'cebu_guest'),  rate: pct(sum(r7,'cebu_review'), sum(r7,'cebu_book'))  },
+    Bohol: { bookings: sum(r7,'bohol_book'), guests: sum(r7,'bohol_guest'), pb: sum(r7p,'bohol_book'), pg: sum(r7p,'bohol_guest'), rate: pct(sum(r7,'bohol_review'),sum(r7,'bohol_book')) },
+    Bali:  { bookings: sum(r7,'bali_book'),  guests: sum(r7,'bali_guest'),  pb: sum(r7p,'bali_book'),  pg: sum(r7p,'bali_guest'),  rate: pct(sum(r7,'bali_review'), sum(r7,'bali_book'))  },
+  };
+
+  const agg30 = {
+    Cebu:  { bookings: sum(r30,'cebu_book'),  pb: sum(r30p,'cebu_book')  },
+    Bohol: { bookings: sum(r30,'bohol_book'), pb: sum(r30p,'bohol_book') },
+    Bali:  { bookings: sum(r30,'bali_book'),  pb: sum(r30p,'bali_book')  },
+  };
+
+  // 30일 일별 차트
+  const lbl30 = []; const d30 = {Cebu:[],Bohol:[],Bali:[]};
   for(let i=29;i>=0;i--){
     const d=ago(i), ds=d.toISOString().slice(0,10);
     lbl30.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
-    CITIES.forEach(c=>d30[c].push(ok.filter(r=>r.start_date===ds&&r.city===c).length));
+    const row = rows.find(r=>r.date===ds) || {};
+    d30.Cebu.push(row.cebu_book||0);
+    d30.Bohol.push(row.bohol_book||0);
+    d30.Bali.push(row.bali_book||0);
   }
 
+  // 월별 차트 (올해 1월~현재)
   const months=[]; const mo={Cebu:[],Bohol:[],Bali:[]};
-  const thisYear = today.getFullYear();
-  const thisMonth = today.getMonth(); // 0-indexed
-  for(let m=0; m<=thisMonth; m++){
-    const d = new Date(thisYear, m, 1);
+  const thisYear=today.getFullYear(), thisMonth=today.getMonth();
+  for(let m=0;m<=thisMonth;m++){
+    const d=new Date(thisYear,m,1);
     months.push(d.toLocaleDateString('en-US',{month:'short'}));
-    const ms = `${thisYear}-${String(m+1).padStart(2,'0')}`;
-    CITIES.forEach(c=>mo[c].push(ok.filter(r=>r.start_date.startsWith(ms)&&r.city===c).length));
+    const ms=`${thisYear}-${String(m+1).padStart(2,'0')}`;
+    const mrows=rows.filter(r=>r.date&&r.date.startsWith(ms));
+    mo.Cebu.push(mrows.reduce((s,r)=>s+(r.cebu_book||0),0));
+    mo.Bohol.push(mrows.reduce((s,r)=>s+(r.bohol_book||0),0));
+    mo.Bali.push(mrows.reduce((s,r)=>s+(r.bali_book||0),0));
   }
-  return {stats,agg30,lbl30,d30,months,mo};
+
+  return {stats, agg30, lbl30, d30, months, mo};
 }
 
 function fmtDelta(c,p,suffix=''){
@@ -950,7 +948,8 @@ async function loadData(manual=false){
         document.head.appendChild(s);
       });
     }
-    if(!rows||rows.length===0) rows=sample();
+    if(!rows||rows.length===0){ rows=sample(); }
+    console.log('Data loaded:', rows.length, 'rows, sample:', rows.slice(-3));
     const p=process(rows);
     lastStats=p.stats;
     renderCities(p.stats);
