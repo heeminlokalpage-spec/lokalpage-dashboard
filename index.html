@@ -647,12 +647,11 @@ function process(rows){
   const fmt = d => d.toISOString().slice(0,10);
   const rng = (f,t) => rows.filter(r => r.date >= fmt(f) && r.date <= fmt(t));
 
-  // 오늘 제외, 어제~7일전 = ago(7) ~ ago(1)
-  const yesterday = ago(1);
-  const r7  = rng(ago(7), yesterday);   // 5/22 ~ 5/28
-  const r7p = rng(ago(14), ago(8));     // 5/15 ~ 5/21 (직전 7일)
-  const r30 = rng(ago(30), yesterday);  // 4/29 ~ 5/28
-  const r30p= rng(ago(60), ago(31));    // 3/30 ~ 4/28
+  // 5/22 ~ 5/28 = ago(7) ~ ago(1)
+  const r7  = rng(ago(7), ago(1));
+  const r7p = rng(ago(14), ago(8));
+  const r30 = rng(ago(30), ago(1));
+  const r30p= rng(ago(60), ago(31));
 
   // 합산 헬퍼
   const sum = (arr, key) => arr.reduce((s,r) => s + (r[key]||0), 0);
