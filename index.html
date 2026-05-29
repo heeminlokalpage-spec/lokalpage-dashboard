@@ -640,18 +640,33 @@ function sample(){
 }
 
 function process(rows){
-  const today = new Date(); today.setHours(0,0,0,0);
-  const ago = n => { const d=new Date(today); d.setDate(today.getDate()-n); return d; };
+  // 데이터에서 가장 최근 날짜를 기준으로 삼음
+  const dates = rows.map(r=>r.date).filter(Boolean).sort();
+  const lastDate = dates[dates.length-1]; // 가장 최근 날짜 (어제)
 
-  // 날짜 범위 필터 (문자열 비교로 정확하게)
-  const fmt = d => d.toISOString().slice(0,10);
-  const rng = (f,t) => rows.filter(r => r.date >= fmt(f) && r.date <= fmt(t));
+  const ago = n => {
+    const d = new Date(lastDate + 'T00:00:00');
+    d.setDate(d.getDate()-n+1);
+    return d.toISOString().slice(0,10);
+  };
 
-  // 5/22 ~ 5/28 = ago(7) ~ ago(1)
-  const r7  = rng(ago(7), ago(1));
-  const r7p = rng(ago(14), ago(8));
-  const r30 = rng(ago(30), ago(1));
-  const r30p= rng(ago(60), ago(31));
+  const rng = (f,t) => rows.filter(r => r.date >= f && r.date <= t);
+
+  // lastDate 포함 최근 7일
+  const d1 = lastDate;
+  const d7 = ago(7);
+  const d7p1 = ago(8);
+  const d14 = ago(14);
+  const d30 = ago(30);
+  const d30p1 = ago(31);
+  const d60 = ago(60);
+
+  console.log('Last date:', lastDate, '7-day range:', d7, '~', d1);
+
+  const r7  = rng(d7, d1);
+  const r7p = rng(d14, d7p1);
+  const r30 = rng(d30, d1);
+  const r30p= rng(d60, d30p1);
 
   // 합산 헬퍼
   const sum = (arr, key) => arr.reduce((s,r) => s + (r[key]||0), 0);
