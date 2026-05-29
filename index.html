@@ -640,30 +640,33 @@ function sample(){
 }
 
 function process(rows){
-  // 데이터에서 가장 최근 날짜를 기준으로 삼음
+  // 데이터에서 가장 최근 날짜 기준
   const dates = rows.map(r=>r.date).filter(Boolean).sort();
-  const lastDate = dates[dates.length-1]; // 가장 최근 날짜 (어제)
+  const d1  = dates[dates.length-1]; // 마지막 날짜 (5/28)
 
-  const ago = n => {
-    const d = new Date(lastDate + 'T00:00:00');
-    d.setDate(d.getDate()-n+1);
-    return d.toISOString().slice(0,10);
-  };
+  // 날짜 문자열에서 n일 전 계산
+  function subDays(dateStr, n){
+    const parts = dateStr.split('-');
+    const d = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
+    d.setDate(d.getDate()-n);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    return y+'-'+m+'-'+dd;
+  }
+
+  const d7   = subDays(d1, 6);   // 5/22
+  const d7p1 = subDays(d1, 7);   // 5/21
+  const d14  = subDays(d1, 13);  // 5/15
+  const d30  = subDays(d1, 29);  // 4/29
+  const d30p1= subDays(d1, 30);  // 4/28
+  const d60  = subDays(d1, 59);  // 3/30
+
+  console.log('Range 7d:', d7, '~', d1);
 
   const rng = (f,t) => rows.filter(r => r.date >= f && r.date <= t);
 
-  // lastDate 포함 최근 7일
-  const d1 = lastDate;
-  const d7 = ago(7);
-  const d7p1 = ago(8);
-  const d14 = ago(14);
-  const d30 = ago(30);
-  const d30p1 = ago(31);
-  const d60 = ago(60);
-
-  console.log('Last date:', lastDate, '7-day range:', d7, '~', d1);
-
-  const r7  = rng(d7, d1);
+  const r7  = rng(d7,  d1);
   const r7p = rng(d14, d7p1);
   const r30 = rng(d30, d1);
   const r30p= rng(d60, d30p1);
