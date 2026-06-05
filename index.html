@@ -108,7 +108,7 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
 .comp-name{font-size:8.5px;font-weight:500;color:var(--t2)}
 .comp-name.us{font-weight:800;color:var(--t1)}
 .comp-tag{font-size:7px;color:var(--t3)}
-.bar-bg{height:5px;background:var(--bg);border-radius:99px;overflow:hidden}
+.bar-bg{height:6px;background:#E2E8F0;border-radius:99px;overflow:hidden}
 .bar-fill{height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
 .bar-us{background:var(--t1)}.bar-ot{background:#D1D5DB}
 
@@ -422,20 +422,57 @@ function renderC6m(months,mo) {
   });
 }
 
+// 원화 기준 가격 (바 비교용)
 const COMP={
-  Cebu: [{n:'LOKALPAGE',v:9050,us:true,p:'₱9,050'},{n:'Treeshade',v:9200,p:'₱9,200'},{n:'Flex',v:8500,p:'₱8,500'}],
-  Bohol:[{n:'LOKALPAGE',v:3600,us:true,p:'₱3,600'},{n:'Boholtravel',v:3650,p:'₱3,650'},{n:'DFree',v:3650,p:'₱3,650'}],
-  Bali: [{n:'LOKALPAGE',v:1300,us:true,p:'Rp1,300'},{n:'Wayan',v:1237,p:'Rp1,237'},{n:'Apong',v:1122,p:'Rp1,122'}],
+  Cebu: [
+    {n:'Flex',      v:210000, us:false},
+    {n:'LOKALPAGE', v:224000, us:true},
+    {n:'Treeshade', v:227000, us:false},
+  ],
+  Bohol:[
+    {n:'Boholtravel',v:90000, us:false},
+    {n:'DFree',      v:90000, us:false},
+    {n:'LOKALPAGE',  v:89000, us:true},
+  ],
+  Bali: [
+    {n:'Apong',     v:95000,  us:false},
+    {n:'Wayan',     v:105000, us:false},
+    {n:'LOKALPAGE', v:110000, us:true},
+  ],
 };
 function renderComp() {
   document.getElementById('compGrid').innerHTML = CITIES.map(c => {
-    const list=COMP[c], mx=Math.max(...list.map(x=>x.v));
+    const list = [...COMP[c]].sort((a,b) => a.v - b.v); // 낮은 가격 순
+    const mn = Math.min(...list.map(x=>x.v));
+    const mx = Math.max(...list.map(x=>x.v));
+    const range = mx - mn || 1;
+
     return `<div class="comp-block">
-      <div class="comp-city-head"><div class="comp-dot" style="background:${COL[c]}"></div><span class="comp-city-name" style="color:${COL[c]}">${c}</span></div>
-      ${list.map(x=>`<div class="comp-item">
-        <div class="comp-name-row"><span class="comp-name${x.us?' us':''}">${x.n}${x.us?' ◆':''}</span><span class="comp-tag">${x.p}</span></div>
-        <div class="bar-bg"><div class="bar-fill ${x.us?'bar-us':'bar-ot'}" data-w="${(x.v/mx*100).toFixed(0)}%"></div></div>
-      </div>`).join('')}
+      <div class="comp-city-head">
+        <div class="comp-dot" style="background:${COL[c]}"></div>
+        <span class="comp-city-name" style="color:${COL[c]}">${c}</span>
+      </div>
+      ${list.map(x => {
+        // 최저가 대비 % 차이로 바 길이 계산 (과장해서 차이 강조)
+        const pct = Math.round((x.v - mn) / range * 100);
+        const barW = 30 + pct * 0.7; // 30%~100% 범위로 펼침
+        const diff = x.v - mn;
+        const diffPct = mn > 0 ? ((diff/mn)*100).toFixed(1) : '0';
+        const tag = x.us
+          ? `<span style="font-size:8px;color:${COL[c]};font-weight:700">◆ OURS</span>`
+          : diff === 0
+            ? `<span style="font-size:8px;color:var(--t3)">최저가</span>`
+            : `<span style="font-size:8px;color:var(--dn)">+${diffPct}%</span>`;
+        return `<div class="comp-item">
+          <div class="comp-name-row">
+            <span class="comp-name${x.us?' us':''}">${x.n}</span>
+            ${tag}
+          </div>
+          <div class="bar-bg">
+            <div class="bar-fill" style="background:${x.us?'#F97316':'#1E293B'};width:0" data-w="${barW.toFixed(0)}%"></div>
+          </div>
+        </div>`;
+      }).join('')}
     </div>`;
   }).join('');
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
