@@ -355,10 +355,10 @@ function renderCities(stats) {
   document.getElementById('cityCards').innerHTML = CITIES.map(c => {
     const s=stats[c], r=rv[c];
     const posHtml = r.pos
-      ? `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-text">${r.pos.split('\n').filter(l=>l.trim()).map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}</div>`
+      ? `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-text">${r.pos}</div>`
       : `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-empty">Tap to add</div>`;
     const negHtml = r.neg
-      ? `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-text">${r.neg.split('\n').filter(l=>l.trim()).map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}</div>`
+      ? `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-text">${r.neg}</div>`
       : `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-empty">Tap to add</div>`;
     return `
     <div class="cc ${CLS[c]}">
@@ -504,9 +504,11 @@ function addNumbers(text) {
   return text.split('\n')
     .filter(l => l.trim())
     .map((l, i) => {
+      // 이미 번호 있으면 제거 후 다시 매기기
       const clean = l.replace(/^\d+\.\s*/, '').trim();
-      return `${i+1}. ${clean}`;
+      return clean ? `${i+1}. ${clean}` : '';
     })
+    .filter(l => l)
     .join('\n');
 }
 
