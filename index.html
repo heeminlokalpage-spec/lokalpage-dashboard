@@ -456,13 +456,15 @@ function renderComp() {
         // 최저가 대비 % 차이로 바 길이 계산 (과장해서 차이 강조)
         const pct = Math.round((x.v - mn) / range * 100);
         const barW = 60 + pct * 0.4; // 60%~100% 범위 (자연스럽게)
-        const diff = x.v - mn;
-        const diffPct = mn > 0 ? ((diff/mn)*100).toFixed(1) : '0';
+        const usPrice = list.find(i=>i.us)?.v || 0;
+        const diffPct = usPrice > 0 ? (((x.v - usPrice) / usPrice) * 100).toFixed(1) : 0;
         const tag = x.us
-          ? `<span style="font-size:8px;color:${COL[c]};font-weight:700">◆ OURS</span>`
-          : diff === 0
-            ? `<span style="font-size:8px;color:var(--t3)">최저가</span>`
-            : `<span style="font-size:8px;color:var(--dn)">+${diffPct}%</span>`;
+          ? `<span style="font-size:8px;color:${COL[c]};font-weight:700">◆ Base</span>`
+          : x.v > usPrice
+            ? `<span style="font-size:8px;color:var(--dn);font-weight:700">+${diffPct}%</span>`
+            : x.v < usPrice
+              ? `<span style="font-size:8px;color:var(--up);font-weight:700">${diffPct}%</span>`
+              : `<span style="font-size:8px;color:var(--t3)">Same</span>`;
         return `<div class="comp-item">
           <div class="comp-name-row">
             <span class="comp-name${x.us?' us':''}">${x.n}</span>
