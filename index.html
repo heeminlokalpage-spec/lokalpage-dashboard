@@ -158,9 +158,9 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
       <button class="ctab bali" onclick="switchTab('Bali',this)">Bali</button>
     </div>
     <label class="mlbl">↑ Top Feedback</label>
-    <textarea class="mta" id="posInput" placeholder="1. 리뷰 내용 입력&#10;2. 엔터 치면 번호 자동" rows="3" oninput="autoNumber(this)"></textarea>
+    <textarea class="mta" id="posInput" placeholder="한 줄에 하나씩 입력하세요…" rows="3"></textarea>
     <label class="mlbl">↓ Key Complaint</label>
-    <textarea class="mta" id="negInput" placeholder="1. 리뷰 내용 입력&#10;2. 엔터 치면 번호 자동" rows="3" oninput="autoNumber(this)"></textarea>
+    <textarea class="mta" id="negInput" placeholder="한 줄에 하나씩 입력하세요…" rows="3"></textarea>
     <div class="mbtns">
       <button class="mb-cancel" onclick="closeModal()">Cancel</button>
       <button class="mb-save" onclick="saveReviews()">Save</button>
@@ -461,27 +461,22 @@ function switchTab(c,btn) {
   document.getElementById('negInput').value=rv[c].neg;
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('open')}
+function addNumbers(text) {
+  return text.split('\n')
+    .filter(l => l.trim())
+    .map((l, i) => {
+      const clean = l.replace(/^\d+\.\s*/, '').trim();
+      return `${i+1}. ${clean}`;
+    })
+    .join('\n');
+}
+
 function saveReviews(){
-  rv[modalCity].pos=document.getElementById('posInput').value.trim();
-  rv[modalCity].neg=document.getElementById('negInput').value.trim();
+  rv[modalCity].pos = addNumbers(document.getElementById('posInput').value);
+  rv[modalCity].neg = addNumbers(document.getElementById('negInput').value);
   closeModal();
   if(lastStats) renderCities(lastStats);
   toast('Saved');
-}
-
-function autoNumber(el) {
-  const pos = el.selectionStart;
-  const lines = el.value.split('\n');
-  const numbered = lines.map((line, i) => {
-    // 이미 번호 있으면 유지, 없으면 추가
-    const clean = line.replace(/^\d+\.\s*/, '');
-    return clean ? `${i+1}. ${clean}` : '';
-  });
-  const newVal = numbered.join('\n');
-  if (newVal !== el.value) {
-    el.value = newVal;
-    el.selectionStart = el.selectionEnd = pos;
-  }
 }
 
 function toast(msg){
