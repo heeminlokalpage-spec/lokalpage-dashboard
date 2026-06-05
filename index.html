@@ -342,10 +342,10 @@ function process(rows) {
 }
 
 function delta(c,p) {
-  if(!p) return '';
-  const d=c-p, pct=Math.round(d/p*100);
+  if(p==null) return '';
+  const d=c-p;
   const cls=d>0?'up':d<0?'dn':'fl', a=d>0?'↑':d<0?'↓':'→';
-  return `<div class="cc-delta ${cls}">${a}${d>0?'+':''}${pct}%</div>`;
+  return `<div class="cc-delta ${cls}">${a}${d>0?'+':''}${d}</div>`;
 }
 
 const rv={Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}};
@@ -390,11 +390,11 @@ function renderCities(stats) {
 function renderSum30(agg) {
   document.getElementById('sum30').innerHTML = CITIES.map(c => {
     const a=agg[c];
-    const d=a.bookings-a.pb, pct=a.pb>0?Math.round(d/a.pb*100):0;
+    const d=a.bookings-a.pb;
     const cls=d>0?'up':d<0?'dn':'fl', ar=d>0?'↑':d<0?'↓':'→';
     return `<div class="sum-card">
       <div class="sum-val" style="color:${COL[c]}">${a.bookings}</div>
-      <div class="sum-sub ${cls}">${ar}${d>0?'+':''}${pct}%</div>
+      <div class="sum-sub ${cls}">${ar}${d>0?'+':''}${d}</div>
       <div class="sum-lbl">${c} Bookings</div>
     </div>`;
   }).join('');
