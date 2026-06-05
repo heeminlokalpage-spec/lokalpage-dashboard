@@ -455,7 +455,7 @@ function renderComp() {
       ${list.map(x => {
         // 최저가 대비 % 차이로 바 길이 계산 (과장해서 차이 강조)
         const pct = Math.round((x.v - mn) / range * 100);
-        const barW = 30 + pct * 0.7; // 30%~100% 범위로 펼침
+        const barW = 60 + pct * 0.4; // 60%~100% 범위 (자연스럽게)
         const diff = x.v - mn;
         const diffPct = mn > 0 ? ((diff/mn)*100).toFixed(1) : '0';
         const tag = x.us
