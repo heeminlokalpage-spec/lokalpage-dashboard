@@ -4,495 +4,168 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Lokalpage Weekly</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#2563EB;--blue-l:#EFF6FF;
+  --green:#16A34A;--green-l:#F0FDF4;
+  --orange:#EA580C;--orange-l:#FFF7ED;
+  --bg:#F8F9FB;--white:#FFFFFF;
+  --border:#E5E7EB;--border2:#F0F2F5;
+  --t1:#0F172A;--t2:#64748B;--t3:#94A3B8;
+  --up:#16A34A;--dn:#DC2626;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:var(--t1);min-height:100vh}
+.page{width:100%;max-width:480px;margin:0 auto}
 
-:root {
-  --blue:    #2563EB;
-  --blue-l:  #EFF6FF;
-  --green:   #16A34A;
-  --green-l: #F0FDF4;
-  --orange:  #EA580C;
-  --orange-l:#FFF7ED;
-  --bg:      #F8F9FB;
-  --white:   #FFFFFF;
-  --border:  #E5E7EB;
-  --border2: #F0F2F5;
-  --t1:      #0F172A;
-  --t2:      #64748B;
-  --t3:      #94A3B8;
-  --up:      #16A34A;
-  --dn:      #DC2626;
-  --card-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-}
+/* HEADER */
+.hd{padding:16px 20px 13px;background:var(--white);border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.hd-title{font-size:14px;font-weight:800;color:var(--t1);letter-spacing:-.3px}
+.hd-date{font-size:10px;color:var(--t3);margin-top:2px;font-weight:500}
+.hd-right{display:flex;align-items:center;gap:8px}
+.live-pill{display:flex;align-items:center;gap:4px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:99px;padding:3px 9px;font-size:10px;font-weight:700;color:var(--green)}
+.live-dot{width:5px;height:5px;border-radius:50%;background:#22C55E;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.rbtn{width:26px;height:26px;border-radius:50%;background:var(--bg);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rbtn svg{width:11px;height:11px;stroke:var(--t2);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.rspin{animation:rot .7s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
 
-html, body {
-  background: var(--bg);
-  font-family: 'Inter', system-ui, sans-serif;
-  color: var(--t1);
-  min-height: 100vh;
-}
+/* SECTIONS */
+.content{display:flex;flex-direction:column}
+.sec{padding:14px 16px 10px}
+.sec-hd{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+.sec-num{font-size:9px;font-weight:800;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:2px 6px}
+.sec-title{font-size:14px;font-weight:800;color:var(--t1);letter-spacing:-.3px}
+.hdiv{height:1px;background:var(--border2);margin:0 16px}
 
-.page {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-}
+/* CITY CARDS */
+.city-cards{display:flex;flex-direction:column;gap:7px}
+.cc{background:var(--white);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;box-shadow:var(--shadow)}
+.cc::before{content:'';width:3px;flex-shrink:0}
+.cc.cebu::before{background:var(--blue)}
+.cc.bohol::before{background:var(--green)}
+.cc.bali::before{background:var(--orange)}
+.cc-inner{flex:1;display:flex;padding:11px 12px 10px;gap:10px;align-items:stretch}
+.cc-stats{display:flex;flex-direction:column;gap:6px;flex-shrink:0;width:120px}
+.cc-city-row{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.cc-city-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.cc-city-name{font-size:11px;font-weight:800}
+.cc.cebu .cc-city-name{color:var(--blue)}
+.cc.bohol .cc-city-name{color:var(--green)}
+.cc.bali .cc-city-name{color:var(--orange)}
+.cc-book-val{font-size:32px;font-weight:900;letter-spacing:-.06em;line-height:1}
+.cc.cebu .cc-book-val{color:var(--blue)}
+.cc.bohol .cc-book-val{color:var(--green)}
+.cc.bali .cc-book-val{color:var(--orange)}
+.cc-book-lbl{font-size:8px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-left:5px}
+.cc-booking{display:flex;align-items:baseline}
+.cc-delta{font-size:10px;font-weight:700;margin-top:3px}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--t3)}
+.cc-sub-metrics{display:flex;gap:10px;margin-top:4px}
+.cc-sub{display:flex;flex-direction:column}
+.cc-sub-val{font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.02em}
+.cc-sub-lbl{font-size:8px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:1px}
+.cc-reviews{flex:1;border-left:1px solid var(--border2);padding-left:10px;display:flex;flex-direction:column;cursor:pointer;min-width:0}
+.cc-reviews:hover{opacity:.85}
+.rv{display:flex;flex-direction:column;flex:1;justify-content:flex-start;padding:6px 0 4px}
+.rv+.rv{border-top:1px solid var(--border2)}
+.rv-tag{font-size:7.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.rv-tag.pos{color:var(--green)}.rv-tag.neg{color:var(--orange)}
+.rv-text{font-size:9px;line-height:1.5;color:var(--t2);font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line;word-break:break-word}
+.rv-empty{font-size:9px;color:var(--t3);font-weight:500}
 
-.dash {
-  width: 100%;
-  background: var(--bg);
-}
+/* CHARTS */
+.chart-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:12px 14px 10px;box-shadow:var(--shadow)}
+.chart-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.chart-title{font-size:12px;font-weight:700;color:var(--t1)}
+.legend{display:flex;gap:10px}
+.leg{display:flex;align-items:center;gap:4px}
+.leg-dot{width:7px;height:7px;border-radius:50%}
+.leg-lbl{font-size:9px;color:var(--t2);font-weight:600}
+.chart-inner{position:relative;height:160px;width:100%}
 
-.hd {
-  padding: 16px 20px 13px;
-  background: var(--white);
-  border-bottom: 1px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 50;
-}
-.hd-title {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--t1);
-  letter-spacing: -.3px;
-}
-.hd-date {
-  font-size: 10px;
-  color: var(--t3);
-  margin-top: 2px;
-  font-weight: 500;
-}
-.hd-right { display: flex; align-items: center; gap: 8px; }
-.live-pill {
-  display: flex; align-items: center; gap: 4px;
-  background: #F0FDF4;
-  border: 1px solid #BBF7D0;
-  border-radius: 99px;
-  padding: 3px 9px;
-  font-size: 10px; font-weight: 700; color: var(--green);
-}
-.live-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: #22C55E;
-  animation: blink 2s infinite;
-}
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
-.rbtn {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: var(--bg); border: 1px solid var(--border);
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-}
-.rbtn:active { background: var(--border); }
-.rbtn svg { width: 11px; height: 11px; stroke: var(--t2); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
-.rspin { animation: rot .7s linear infinite; }
-@keyframes rot { to { transform: rotate(360deg); } }
+/* SUM CARDS */
+.sum30{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px}
+.sum-card{background:var(--white);border-radius:10px;padding:9px 10px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.sum-val{font-size:17px;font-weight:800;letter-spacing:-.04em}
+.sum-sub{font-size:9px;font-weight:700;margin-top:1px}
+.sum-lbl{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;font-weight:600}
 
-.content {
-  display: flex;
-  flex-direction: column;
-}
+/* COMPETITOR */
+.comp-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.comp-block{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:10px 11px 9px;box-shadow:var(--shadow)}
+.comp-city-head{display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.comp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.comp-city-name{font-size:10px;font-weight:800}
+.comp-item{margin-bottom:7px}
+.comp-item:last-child{margin-bottom:0}
+.comp-name-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px}
+.comp-name{font-size:8.5px;font-weight:500;color:var(--t2)}
+.comp-name.us{font-weight:800;color:var(--t1)}
+.comp-tag{font-size:7px;color:var(--t3)}
+.bar-bg{height:5px;background:var(--bg);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;border-radius:99px;width:0;transition:width 1.2s cubic-bezier(.22,1,.36,1)}
+.bar-us{background:var(--t1)}.bar-ot{background:#D1D5DB}
 
-/* ── SECTION ── */
-.sec { padding: 14px 16px 10px; }
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-bg.open{opacity:1;pointer-events:auto}
+.modal{background:var(--white);border-radius:24px 24px 0 0;border:1px solid var(--border);padding:22px 20px 40px;width:100%;max-width:500px;transform:translateY(24px);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.modal-bg.open .modal{transform:translateY(0)}
+.modal-title{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:14px}
+.ctabs{display:flex;gap:6px;margin-bottom:14px}
+.ctab{padding:5px 14px;border-radius:99px;font-size:11px;font-weight:700;border:1px solid var(--border);background:var(--bg);color:var(--t2);cursor:pointer;font-family:inherit}
+.ctab.active.cebu{background:var(--blue-l);color:var(--blue);border-color:#BFDBFE}
+.ctab.active.bohol{background:var(--green-l);color:var(--green);border-color:#BBF7D0}
+.ctab.active.bali{background:var(--orange-l);color:var(--orange);border-color:#FED7AA}
+.mlbl{font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px;display:block}
+.mta{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;font-family:inherit;font-size:13px;color:var(--t1);resize:none;outline:none;min-height:80px;line-height:1.6;margin-bottom:10px;white-space:pre-wrap}
+.mta:focus{border-color:#93C5FD;background:var(--white)}
+.mta::placeholder{color:var(--t3)}
+.mbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.mb-cancel{padding:12px;border:1.5px solid var(--border);background:var(--bg);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:var(--t2);cursor:pointer}
+.mb-save{padding:12px;border:none;background:var(--t1);border-radius:12px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer}
 
-.sec-hd {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-.sec-num {
-  font-size: 9px;
-  font-weight: 800;
-  color: var(--t3);
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 2px 6px;
-}
-.sec-title {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--t1);
-  letter-spacing: -.3px;
-}
+/* LOADING */
+.loading{position:fixed;inset:0;background:rgba(248,249,251,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:100;transition:opacity .3s}
+.loading.out{opacity:0;pointer-events:none}
+.spinner{width:26px;height:26px;border-radius:50%;border:2.5px solid var(--border);border-top-color:var(--t1);animation:rot .65s linear infinite}
+.loading-lbl{font-size:11px;font-weight:600;color:var(--t2)}
 
-.hdiv { height: 1px; background: var(--border2); margin: 0 16px; }
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--t1);color:#fff;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:600;opacity:0;transition:all .28s ease;z-index:999;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── CITY CARD (Last 7 Days) ── */
-.city-cards { display: flex; flex-direction: column; gap: 7px; }
+/* FAB */
+.fab{position:fixed;bottom:24px;right:20px;width:38px;height:38px;border-radius:50%;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:99}
+.fab svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-.cc {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  overflow: hidden;
-  display: flex;
-  box-shadow: var(--card-shadow);
-}
-
-/* left accent stripe */
-.cc::before {
-  content: '';
-  width: 3px;
-  flex-shrink: 0;
-  border-radius: 0;
-}
-.cc.cebu::before  { background: var(--blue); }
-.cc.bohol::before { background: var(--green); }
-.cc.bali::before  { background: var(--orange); }
-
-.cc-inner {
-  flex: 1;
-  display: flex;
-  padding: 11px 12px 10px;
-  gap: 10px;
-  align-items: stretch;
-}
-
-/* ── STATS SIDE (left) ── */
-.cc-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex-shrink: 0;
-  width: 120px;
-}
-
-.cc-city-row {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-bottom: 2px;
-}
-.cc-city-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.cc-city-name {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .01em;
-}
-.cc.cebu  .cc-city-name { color: var(--blue); }
-.cc.bohol .cc-city-name { color: var(--green); }
-.cc.bali  .cc-city-name { color: var(--orange); }
-
-/* booking — big number */
-.cc-booking {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-}
-.cc-book-val {
-  font-size: 32px;
-  font-weight: 900;
-  letter-spacing: -.06em;
-  line-height: 1;
-}
-.cc.cebu  .cc-book-val { color: var(--blue); }
-.cc.bohol .cc-book-val { color: var(--green); }
-.cc.bali  .cc-book-val { color: var(--orange); }
-.cc-book-lbl {
-  font-size: 8px;
-  font-weight: 700;
-  color: var(--t3);
-  text-transform: uppercase;
-  letter-spacing: .07em;
-}
-
-.cc-delta {
-  font-size: 10px;
-  font-weight: 700;
-}
-.up { color: var(--up); }
-.dn { color: var(--dn); }
-.fl { color: var(--t3); }
-
-/* sub metrics */
-.cc-sub-metrics {
-  display: flex;
-  gap: 10px;
-  margin-top: 2px;
-}
-.cc-sub { display: flex; flex-direction: column; }
-.cc-sub-val {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--t1);
-  letter-spacing: -.02em;
-}
-.cc-sub-lbl {
-  font-size: 8px;
-  font-weight: 600;
-  color: var(--t3);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  margin-top: 1px;
-}
-
-/* ── REVIEW SIDE (right) ── */
-.cc-reviews {
-  flex: 1;
-  border-left: 1px solid var(--border2);
-  padding-left: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  cursor: pointer;
-  min-width: 0;
-  align-self: stretch;
-}
-.cc-reviews:hover { opacity: .85; }
-
-.rv {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  justify-content: flex-start;
-  padding: 6px 0 4px;
-  min-height: 0;
-}
-.rv + .rv { border-top: 1px solid var(--border2); }
-
-.rv-tag {
-  font-size: 7.5px;
-  font-weight: 800;
-  letter-spacing: .1em;
-  text-transform: uppercase;
-  margin-bottom: 3px;
-}
-.rv-tag.pos { color: var(--green); }
-.rv-tag.neg { color: var(--orange); }
-
-.rv-text {
-  font-size: 9px;
-  line-height: 1.5;
-  color: var(--t2);
-  font-style: italic;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  white-space: pre-line;
-  word-break: break-word;
-}
-.rv-empty {
-  font-size: 9px;
-  color: var(--t3);
-  font-weight: 500;
-}
-
-/* ── CHART SECTION ── */
-.chart-wrap-outer {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 14px 10px;
-  box-shadow: var(--card-shadow);
-  display: flex;
-  flex-direction: column;
-}
-.chart-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  flex-shrink: 0;
-}
-.chart-title { font-size: 12px; font-weight: 700; color: var(--t1); letter-spacing: -.2px; }
-.legend { display: flex; gap: 10px; }
-.leg { display: flex; align-items: center; gap: 4px; }
-.leg-dot { width: 7px; height: 7px; border-radius: 50%; }
-.leg-lbl { font-size: 9px; color: var(--t2); font-weight: 600; }
-.chart-inner { position: relative; height: 160px; width: 100%; }
-.chart-inner canvas { display: block; }
-
-/* 30-day summary row */
-.sum30 {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 6px;
-  margin-top: 8px;
-}
-.sum-card {
-  background: var(--white);
-  border-radius: 10px;
-  padding: 9px 10px;
-  border: 1px solid var(--border);
-  box-shadow: var(--card-shadow);
-}
-.sum-val { font-size: 17px; font-weight: 800; color: var(--t1); letter-spacing: -.04em; }
-.sum-sub { font-size: 9px; font-weight: 700; margin-top: 1px; }
-.sum-lbl { font-size: 8px; color: var(--t3); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; font-weight: 600; }
-
-/* ── COMPETITOR ── */
-.comp-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 6px;
-}
-.comp-block {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 10px 11px 9px;
-  box-shadow: var(--card-shadow);
-}
-.comp-city-head {
-  display: flex; align-items: center; gap: 5px;
-  margin-bottom: 8px;
-}
-.comp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.comp-city-name { font-size: 10px; font-weight: 800; }
-.comp-item { margin-bottom: 7px; }
-.comp-item:last-child { margin-bottom: 0; }
-.comp-name-row {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 3px;
-}
-.comp-name { font-size: 8.5px; font-weight: 500; color: var(--t2); }
-.comp-name.us { font-weight: 800; color: var(--t1); }
-.comp-us-tag { font-size: 7px; color: var(--t3); }
-.bar-bg { height: 5px; background: var(--bg); border-radius: 99px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 99px; width: 0; transition: width 1.2s cubic-bezier(.22,1,.36,1); }
-.bar-us { background: var(--t1); }
-.bar-ot { background: #D1D5DB; }
-
-/* ── MODAL ── */
-.modal-bg {
-  position: fixed; inset: 0;
-  background: rgba(15,23,42,.5);
-  backdrop-filter: blur(6px);
-  display: flex; align-items: flex-end; justify-content: center;
-  z-index: 300;
-  opacity: 0; pointer-events: none; transition: opacity .25s;
-}
-.modal-bg.open { opacity: 1; pointer-events: auto; }
-.modal {
-  background: var(--white);
-  border-radius: 24px 24px 0 0;
-  border: 1px solid var(--border);
-  padding: 22px 20px 40px;
-  width: 100%; max-width: 500px;
-  transform: translateY(24px);
-  transition: transform .3s cubic-bezier(.4,0,.2,1);
-}
-.modal-bg.open .modal { transform: translateY(0); }
-.modal-title { font-size: 16px; font-weight: 800; color: var(--t1); margin-bottom: 14px; letter-spacing: -.3px; }
-.ctabs { display: flex; gap: 6px; margin-bottom: 14px; }
-.ctab {
-  padding: 5px 14px; border-radius: 99px;
-  font-size: 11px; font-weight: 700;
-  border: 1px solid var(--border);
-  background: var(--bg); color: var(--t2);
-  cursor: pointer; font-family: inherit; transition: all .15s;
-}
-.ctab.active.cebu  { background: var(--blue-l);   color: var(--blue);   border-color: #BFDBFE; }
-.ctab.active.bohol { background: var(--green-l);  color: var(--green);  border-color: #BBF7D0; }
-.ctab.active.bali  { background: var(--orange-l); color: var(--orange); border-color: #FED7AA; }
-.mlbl { font-size: 10px; font-weight: 700; color: var(--t2); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 5px; display: block; }
-.mta {
-  width: 100%; background: var(--bg);
-  border: 1.5px solid var(--border); border-radius: 12px;
-  padding: 10px 12px; font-family: inherit; font-size: 13px;
-  color: var(--t1); resize: none; outline: none;
-  min-height: 90px; line-height: 1.6; margin-bottom: 10px;
-  white-space: pre-wrap; word-break: break-word;
-  transition: border-color .2s;
-}
-.mta:focus { border-color: #93C5FD; background: var(--white); }
-.mta::placeholder { color: var(--t3); }
-.mbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
-.mb-cancel {
-  padding: 12px; border: 1.5px solid var(--border);
-  background: var(--bg); border-radius: 12px;
-  font-family: inherit; font-size: 13px; font-weight: 700;
-  color: var(--t2); cursor: pointer;
-}
-.mb-save {
-  padding: 12px; border: none;
-  background: var(--t1); border-radius: 12px;
-  font-family: inherit; font-size: 13px; font-weight: 700;
-  color: #fff; cursor: pointer;
-}
-.mb-cancel:active { opacity: .7; }
-.mb-save:active { opacity: .8; }
-
-.loading {
-  position: fixed; inset: 0;
-  background: rgba(248,249,251,.92);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 10px;
-  z-index: 100; transition: opacity .3s;
-}
-.loading.out { opacity: 0; pointer-events: none; }
-.spinner {
-  width: 26px; height: 26px; border-radius: 50%;
-  border: 2.5px solid var(--border);
-  border-top-color: var(--t1);
-  animation: rot .65s linear infinite;
-}
-.loading-lbl { font-size: 11px; font-weight: 600; color: var(--t2); }
-
-/* ── TOAST ── */
-.toast {
-  position: fixed; bottom: 24px; left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  background: var(--t1); color: #fff;
-  padding: 8px 18px; border-radius: 99px;
-  font-size: 12px; font-weight: 600;
-  opacity: 0; transition: all .28s ease;
-  z-index: 999; pointer-events: none;
-  white-space: nowrap;
-  box-shadow: 0 4px 16px rgba(0,0,0,.2);
-}
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-/* ── FAB ── */
-.fab {
-  position: fixed; bottom: 24px; right: 20px;
-  width: 38px; height: 38px; border-radius: 50%;
-  background: var(--t1); border: none;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 16px rgba(0,0,0,.25); z-index: 99; transition: transform .15s;
-}
-.fab:active { transform: scale(.9); }
-.fab svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-@media (min-width: 600px) {
-  .page { max-width: 520px; }
-}
-@media (min-width: 960px) {
-  .page { max-width: 560px; }
-}
+@media(min-width:600px){.page{max-width:520px}}
+@media(min-width:960px){.page{max-width:560px}}
 </style>
 </head>
 <body>
 
-<!-- Modal -->
-<div class="modal-bg" id="modalBg" onclick="handleBgClick(event)">
-  <div class="modal" onclick="event.stopPropagation()">
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
     <div class="modal-title">Featured Reviews</div>
     <div class="ctabs">
       <button class="ctab cebu active" onclick="switchTab('Cebu',this)">Cebu</button>
-      <button class="ctab bohol"       onclick="switchTab('Bohol',this)">Bohol</button>
-      <button class="ctab bali"        onclick="switchTab('Bali',this)">Bali</button>
+      <button class="ctab bohol" onclick="switchTab('Bohol',this)">Bohol</button>
+      <button class="ctab bali" onclick="switchTab('Bali',this)">Bali</button>
     </div>
     <label class="mlbl">↑ Top Feedback</label>
-    <textarea class="mta" id="posInput" placeholder="Best review this week…" rows="4"></textarea>
+    <textarea class="mta" id="posInput" placeholder="Best review this week…" rows="3"></textarea>
     <label class="mlbl">↓ Key Complaint</label>
-    <textarea class="mta" id="negInput" placeholder="Review to address…" rows="4"></textarea>
+    <textarea class="mta" id="negInput" placeholder="Review to address…" rows="3"></textarea>
     <div class="mbtns">
       <button class="mb-cancel" onclick="closeModal()">Cancel</button>
-      <button class="mb-save"   onclick="saveReviews()">Save</button>
+      <button class="mb-save" onclick="saveReviews()">Save</button>
     </div>
   </div>
 </div>
@@ -502,14 +175,12 @@ html, body {
   <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
 </button>
 
-<div class="page dash" id="theDash">
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span class="loading-lbl">Loading…</span>
+</div>
 
-  <div class="loading" id="loading">
-    <div class="spinner"></div>
-    <span class="loading-lbl">Loading…</span>
-  </div>
-
-  <!-- HEADER -->
+<div class="page" id="theDash">
   <div class="hd">
     <div>
       <div class="hd-title">LOKALPAGE WEEKLY DATA</div>
@@ -527,25 +198,14 @@ html, body {
   </div>
 
   <div class="content">
-
-    <!-- 01 LAST 7 DAYS -->
     <div class="sec">
-      <div class="sec-hd">
-        <span class="sec-num">01</span>
-        <span class="sec-title">Last 7 Days</span>
-      </div>
+      <div class="sec-hd"><span class="sec-num">01</span><span class="sec-title">Last 7 Days</span></div>
       <div class="city-cards" id="cityCards"></div>
     </div>
-
     <div class="hdiv"></div>
-
-    <!-- 02 LAST 30 DAYS -->
     <div class="sec">
-      <div class="sec-hd">
-        <span class="sec-num">02</span>
-        <span class="sec-title">Last 30 Days</span>
-      </div>
-      <div class="chart-wrap-outer">
+      <div class="sec-hd"><span class="sec-num">02</span><span class="sec-title">Last 30 Days</span></div>
+      <div class="chart-card">
         <div class="chart-top">
           <span class="chart-title">Daily Bookings</span>
           <div class="legend">
@@ -556,18 +216,12 @@ html, body {
         </div>
         <div class="chart-inner"><canvas id="c30"></canvas></div>
       </div>
-      <div class="sum30" id="sum30" style="margin-top:8px"></div>
+      <div class="sum30" id="sum30"></div>
     </div>
-
     <div class="hdiv"></div>
-
-    <!-- 03 LAST 6 MONTHS -->
     <div class="sec">
-      <div class="sec-hd">
-        <span class="sec-num">03</span>
-        <span class="sec-title">Monthly Bookings (2026)</span>
-      </div>
-      <div class="chart-wrap-outer">
+      <div class="sec-hd"><span class="sec-num">03</span><span class="sec-title">Monthly Bookings (2026)</span></div>
+      <div class="chart-card">
         <div class="chart-top">
           <span class="chart-title">Bookings by Month · 2026</span>
           <div class="legend">
@@ -579,18 +233,11 @@ html, body {
         <div class="chart-inner"><canvas id="c6m"></canvas></div>
       </div>
     </div>
-
     <div class="hdiv"></div>
-
-    <!-- 04 COMPETITOR -->
     <div class="sec">
-      <div class="sec-hd">
-        <span class="sec-num">04</span>
-        <span class="sec-title">Competitor Price Index</span>
-      </div>
+      <div class="sec-hd"><span class="sec-num">04</span><span class="sec-title">Competitor Price Index</span></div>
       <div class="comp-grid" id="compGrid"></div>
     </div>
-
     <div style="height:16px"></div>
   </div>
 </div>
@@ -598,143 +245,119 @@ html, body {
 <script>
 const GAS_URL = "https://script.google.com/macros/s/AKfycbzzlU7N1xBkcI76HllFkYbPvbnEwmCTUa99kjyRpc4wz0xYUpmLvaKukL3L9tqtP310qA/exec";
 const CITIES = ['Cebu','Bohol','Bali'];
-const COL  = { Cebu:'#2563EB', Bohol:'#16A34A', Bali:'#EA580C' };
-const COLL = { Cebu:'#EFF6FF', Bohol:'#F0FDF4', Bali:'#FFF7ED' };
-const CLS  = { Cebu:'cebu', Bohol:'bohol', Bali:'bali' };
+const COL = {Cebu:'#2563EB',Bohol:'#16A34A',Bali:'#EA580C'};
+const CLS = {Cebu:'cebu',Bohol:'bohol',Bali:'bali'};
 
-// ── pivot 시트 데이터 정규화 ──
-// 컬럼 순서: date | 세부(count,guest,review) | 발리(count,guest,review) | 보홀(count,guest,review)
-function normalize(raw){
+// 날짜 문자열에서 n일 빼기
+function subDays(dateStr, n) {
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  dt.setDate(dt.getDate() - n);
+  return dt.getFullYear() + '-' +
+    String(dt.getMonth()+1).padStart(2,'0') + '-' +
+    String(dt.getDate()).padStart(2,'0');
+}
+
+function normalize(raw) {
   return raw
-    .filter(r => r['date'] && String(r['date']).length === 10)
+    .filter(r => r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date))
     .map(r => ({
-      date:         String(r['date']),
-      cebu_book:    Number(r['cebu_book'])||0,
-      cebu_guest:   Number(r['cebu_guest'])||0,
-      cebu_review:  Number(r['cebu_review'])||0,
-      bali_book:    Number(r['bali_book'])||0,
-      bali_guest:   Number(r['bali_guest'])||0,
-      bali_review:  Number(r['bali_review'])||0,
-      bohol_book:   Number(r['bohol_book'])||0,
-      bohol_guest:  Number(r['bohol_guest'])||0,
-      bohol_review: Number(r['bohol_review'])||0,
+      date:         r.date,
+      cebu_book:    Number(r.cebu_book)  ||0,
+      cebu_guest:   Number(r.cebu_guest) ||0,
+      cebu_review:  Number(r.cebu_review)||0,
+      bali_book:    Number(r.bali_book)  ||0,
+      bali_guest:   Number(r.bali_guest) ||0,
+      bali_review:  Number(r.bali_review)||0,
+      bohol_book:   Number(r.bohol_book) ||0,
+      bohol_guest:  Number(r.bohol_guest)||0,
+      bohol_review: Number(r.bohol_review)||0,
     }));
 }
 
-function sample(){
-  const today=new Date(); today.setHours(0,0,0,0);
-  const rows=[];
-  for(let i=59;i>=0;i--){
-    const d=new Date(today); d.setDate(today.getDate()-i);
-    rows.push({
-      date: d.toISOString().slice(0,10),
-      cebu_book:  Math.floor(Math.random()*10+5),
-      cebu_guest: Math.floor(Math.random()*20+10),
-      bohol_book: Math.floor(Math.random()*8+3),
-      bohol_guest:Math.floor(Math.random()*15+8),
-      bali_book:  Math.floor(Math.random()*7+3),
-      bali_guest: Math.floor(Math.random()*12+5),
-    });
-  }
-  return rows;
-}
-
-function process(rows){
-  // 데이터에서 가장 최근 날짜 기준
-  const dates = rows.map(r=>r.date).filter(Boolean).sort();
-  const d1  = dates[dates.length-1]; // 마지막 날짜 (5/28)
-
-  // 날짜 문자열에서 n일 전 계산
-  function subDays(dateStr, n){
-    const parts = dateStr.split('-');
-    const d = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
-    d.setDate(d.getDate()-n);
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const dd = String(d.getDate()).padStart(2,'0');
-    return y+'-'+m+'-'+dd;
-  }
-
-  const d7   = subDays(d1, 6);   // 5/22
-  const d7p1 = subDays(d1, 7);   // 5/21
-  const d14  = subDays(d1, 13);  // 5/15
-  const d30  = subDays(d1, 29);  // 4/29
-  const d30p1= subDays(d1, 30);  // 4/28
-  const d60  = subDays(d1, 59);  // 3/30
-
-  console.log('Range 7d:', d7, '~', d1);
+function process(rows) {
+  // 데이터의 마지막 날짜 기준
+  const sorted = rows.map(r=>r.date).sort();
+  const last = sorted[sorted.length-1]; // 예: 2026-05-28
 
   const rng = (f,t) => rows.filter(r => r.date >= f && r.date <= t);
+  const sum = (arr, k) => arr.reduce((s,r) => s+(r[k]||0), 0);
+  const pct = (a,b) => b>0 ? Math.round(a/b*100) : 0;
 
-  const r7  = rng(d7,  d1);
-  const r7p = rng(d14, d7p1);
-  const r30 = rng(d30, d1);
-  const r30p= rng(d60, d30p1);
+  // Last 7 days: last~last-6 (예: 5/22~5/28)
+  const w1s = subDays(last, 6);  // 5/22
+  const w1e = last;               // 5/28
+  const w2s = subDays(last, 13); // 5/15
+  const w2e = subDays(last, 7);  // 5/21
 
-  // 합산 헬퍼
-  const sum = (arr, key) => arr.reduce((s,r) => s + (r[key]||0), 0);
+  const r7  = rng(w1s, w1e);
+  const r7p = rng(w2s, w2e);
 
-  const pct = (rev, book) => book > 0 ? Math.round(rev/book*100) : 0;
+  // Last 30 days
+  const m1s = subDays(last, 29);
+  const m2s = subDays(last, 59);
+  const m2e = subDays(last, 30);
+  const r30  = rng(m1s, w1e);
+  const r30p = rng(m2s, m2e);
+
   const stats = {
-    Cebu:  { bookings: sum(r7,'cebu_book'),  guests: sum(r7,'cebu_guest'),  pb: sum(r7p,'cebu_book'),  pg: sum(r7p,'cebu_guest'),  rate: pct(sum(r7,'cebu_review'), sum(r7,'cebu_book'))  },
-    Bohol: { bookings: sum(r7,'bohol_book'), guests: sum(r7,'bohol_guest'), pb: sum(r7p,'bohol_book'), pg: sum(r7p,'bohol_guest'), rate: pct(sum(r7,'bohol_review'),sum(r7,'bohol_book')) },
-    Bali:  { bookings: sum(r7,'bali_book'),  guests: sum(r7,'bali_guest'),  pb: sum(r7p,'bali_book'),  pg: sum(r7p,'bali_guest'),  rate: pct(sum(r7,'bali_review'), sum(r7,'bali_book'))  },
+    Cebu:  {bookings:sum(r7,'cebu_book'),  guests:sum(r7,'cebu_guest'),  rate:pct(sum(r7,'cebu_review'), sum(r7,'cebu_book')),  pb:sum(r7p,'cebu_book'),  pg:sum(r7p,'cebu_guest')},
+    Bohol: {bookings:sum(r7,'bohol_book'), guests:sum(r7,'bohol_guest'), rate:pct(sum(r7,'bohol_review'),sum(r7,'bohol_book')), pb:sum(r7p,'bohol_book'), pg:sum(r7p,'bohol_guest')},
+    Bali:  {bookings:sum(r7,'bali_book'),  guests:sum(r7,'bali_guest'),  rate:pct(sum(r7,'bali_review'), sum(r7,'bali_book')),  pb:sum(r7p,'bali_book'),  pg:sum(r7p,'bali_guest')},
   };
 
   const agg30 = {
-    Cebu:  { bookings: sum(r30,'cebu_book'),  pb: sum(r30p,'cebu_book')  },
-    Bohol: { bookings: sum(r30,'bohol_book'), pb: sum(r30p,'bohol_book') },
-    Bali:  { bookings: sum(r30,'bali_book'),  pb: sum(r30p,'bali_book')  },
+    Cebu:  {bookings:sum(r30,'cebu_book'),  pb:sum(r30p,'cebu_book')},
+    Bohol: {bookings:sum(r30,'bohol_book'), pb:sum(r30p,'bohol_book')},
+    Bali:  {bookings:sum(r30,'bali_book'),  pb:sum(r30p,'bali_book')},
   };
 
-  // 30일 일별 차트
-  const lbl30 = []; const d30 = {Cebu:[],Bohol:[],Bali:[]};
-  for(let i=29;i>=0;i--){
-    const d=ago(i), ds=d.toISOString().slice(0,10);
-    lbl30.push(d.toLocaleDateString('en-US',{month:'short',day:'numeric'}));
-    const row = rows.find(r=>r.date===ds) || {};
+  // 30일 차트
+  const lbl30=[]; const d30={Cebu:[],Bohol:[],Bali:[]};
+  for(let i=29;i>=0;i--) {
+    const ds = subDays(last, i);
+    lbl30.push(ds.slice(5)); // MM-DD
+    const row = rows.find(r=>r.date===ds)||{};
     d30.Cebu.push(row.cebu_book||0);
     d30.Bohol.push(row.bohol_book||0);
     d30.Bali.push(row.bali_book||0);
   }
 
-  // 월별 차트 (올해 1월~현재)
+  // 월별 차트
   const months=[]; const mo={Cebu:[],Bohol:[],Bali:[]};
-  const thisYear=today.getFullYear(), thisMonth=today.getMonth();
-  for(let m=0;m<=thisMonth;m++){
-    const d=new Date(thisYear,m,1);
-    months.push(d.toLocaleDateString('en-US',{month:'short'}));
-    const ms=`${thisYear}-${String(m+1).padStart(2,'0')}`;
-    const mrows=rows.filter(r=>r.date&&r.date.startsWith(ms));
-    mo.Cebu.push(mrows.reduce((s,r)=>s+(r.cebu_book||0),0));
-    mo.Bohol.push(mrows.reduce((s,r)=>s+(r.bohol_book||0),0));
-    mo.Bali.push(mrows.reduce((s,r)=>s+(r.bali_book||0),0));
+  const yr = new Date(last+'T00:00:00').getFullYear();
+  const curM = new Date(last+'T00:00:00').getMonth();
+  for(let m=0;m<=curM;m++) {
+    const ms = yr+'-'+String(m+1).padStart(2,'0');
+    months.push(['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m]);
+    const mr = rows.filter(r=>r.date.startsWith(ms));
+    mo.Cebu.push(mr.reduce((s,r)=>s+(r.cebu_book||0),0));
+    mo.Bohol.push(mr.reduce((s,r)=>s+(r.bohol_book||0),0));
+    mo.Bali.push(mr.reduce((s,r)=>s+(r.bali_book||0),0));
   }
 
   return {stats, agg30, lbl30, d30, months, mo};
 }
 
-function fmtDelta(c,p,suffix=''){
-  if(p==null||p===0) return '';
+function delta(c,p) {
+  if(!p) return '';
   const d=c-p, pct=Math.round(d/p*100);
   const cls=d>0?'up':d<0?'dn':'fl', a=d>0?'↑':d<0?'↓':'→';
-  return `<span class="${cls}">${a}${d>0?'+':''}${pct}%${suffix}</span>`;
+  return `<div class="cc-delta ${cls}">${a}${d>0?'+':''}${pct}%</div>`;
 }
 
-// reviews state
 const rv={Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}};
 let modalCity='Cebu', lastStats=null;
 
-function renderCities(stats){
-  document.getElementById('cityCards').innerHTML=CITIES.map(c=>{
-    const s=stats[c];
-    const r=rv[c];
-    const posHtml=r.pos
-      ?`<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-text">"${r.pos}"</div>`
-      :`<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-empty">Tap to add</div>`;
-    const negHtml=r.neg
-      ?`<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-text">"${r.neg}"</div>`
-      :`<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-empty">Tap to add</div>`;
+function renderCities(stats) {
+  document.getElementById('cityCards').innerHTML = CITIES.map(c => {
+    const s=stats[c], r=rv[c];
+    const posHtml = r.pos
+      ? `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-text">"${r.pos}"</div>`
+      : `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-empty">Tap to add</div>`;
+    const negHtml = r.neg
+      ? `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-text">"${r.neg}"</div>`
+      : `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-empty">Tap to add</div>`;
     return `
     <div class="cc ${CLS[c]}">
       <div class="cc-inner">
@@ -747,16 +370,10 @@ function renderCities(stats){
             <span class="cc-book-val">${s.bookings}</span>
             <span class="cc-book-lbl">Bookings</span>
           </div>
-          <div class="cc-delta">${fmtDelta(s.bookings,s.pb)}</div>
+          ${delta(s.bookings,s.pb)}
           <div class="cc-sub-metrics">
-            <div class="cc-sub">
-              <span class="cc-sub-val">${s.guests}</span>
-              <span class="cc-sub-lbl">Guests</span>
-            </div>
-            <div class="cc-sub">
-              <span class="cc-sub-val">${s.rate}%</span>
-              <span class="cc-sub-lbl">Review</span>
-            </div>
+            <div class="cc-sub"><span class="cc-sub-val">${s.guests}</span><span class="cc-sub-lbl">Guests</span></div>
+            <div class="cc-sub"><span class="cc-sub-val">${s.rate}%</span><span class="cc-sub-lbl">Review</span></div>
           </div>
         </div>
         <div class="cc-reviews" onclick="openModal('${c}')">
@@ -768,125 +385,54 @@ function renderCities(stats){
   }).join('');
 }
 
-function renderSum30(agg){
-  document.getElementById('sum30').innerHTML=CITIES.map(c=>{
+function renderSum30(agg) {
+  document.getElementById('sum30').innerHTML = CITIES.map(c => {
     const a=agg[c];
-    return `
-    <div class="sum-card">
+    const d=a.bookings-a.pb, pct=a.pb>0?Math.round(d/a.pb*100):0;
+    const cls=d>0?'up':d<0?'dn':'fl', ar=d>0?'↑':d<0?'↓':'→';
+    return `<div class="sum-card">
       <div class="sum-val" style="color:${COL[c]}">${a.bookings}</div>
-      <div class="sum-sub">${fmtDelta(a.bookings,a.pb)}</div>
+      <div class="sum-sub ${cls}">${ar}${d>0?'+':''}${pct}%</div>
       <div class="sum-lbl">${c} Bookings</div>
     </div>`;
   }).join('');
 }
 
 let ci30=null, ci6m=null;
-const TT={
-  backgroundColor:'#0F172A',titleColor:'#fff',bodyColor:'rgba(255,255,255,.7)',
-  padding:10,cornerRadius:8,
-  titleFont:{family:'Inter,system-ui',size:10,weight:'700'},
-  bodyFont:{family:'Inter,system-ui',size:11},
-  borderColor:'rgba(255,255,255,.1)',borderWidth:1,
-};
-const CHART_DEFAULTS = {
-  responsive:true,
-  maintainAspectRatio:false,
-  devicePixelRatio: window.devicePixelRatio || 2,
-  animation:{ duration:600, easing:'easeOutQuart' },
-};
-function renderC30(lbl,d){
+const TT={backgroundColor:'#0F172A',titleColor:'#fff',bodyColor:'rgba(255,255,255,.7)',padding:10,cornerRadius:8,titleFont:{family:'Inter',size:10,weight:'700'},bodyFont:{family:'Inter',size:11}};
+const CD={responsive:true,maintainAspectRatio:false,devicePixelRatio:window.devicePixelRatio||2};
+
+function renderC30(lbl,d) {
   if(ci30) ci30.destroy();
-  ci30=new Chart(document.getElementById('c30'),{
+  ci30 = new Chart(document.getElementById('c30'), {
     type:'line',
-    data:{labels:lbl,datasets:CITIES.map(c=>({
-      label:c,data:d[c],
-      borderColor:COL[c],
-      backgroundColor:COL[c]+'18',
-      borderWidth:2,
-      pointRadius:0,
-      pointHoverRadius:5,
-      pointHoverBackgroundColor:COL[c],
-      tension:.4,
-      fill:true
-    }))},
-    options:{
-      ...CHART_DEFAULTS,
-      plugins:{
-        legend:{display:false},
-        tooltip:{...TT,mode:'index',intersect:false}
-      },
-      scales:{
-        x:{
-          ticks:{maxTicksLimit:5,font:{family:'Inter',size:9},color:'#94A3B8'},
-          grid:{color:'#F1F5F9',drawTicks:false},
-          border:{display:false},
-        },
-        y:{
-          ticks:{font:{family:'Inter',size:9},color:'#94A3B8',maxTicksLimit:5,padding:6},
-          grid:{color:'#F1F5F9',drawTicks:false},
-          border:{display:false}
-        }
-      },
-      interaction:{mode:'index',intersect:false}
-    }
+    data:{labels:lbl,datasets:CITIES.map(c=>({label:c,data:d[c],borderColor:COL[c],backgroundColor:COL[c]+'15',borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:.4,fill:true}))},
+    options:{...CD,plugins:{legend:{display:false},tooltip:{...TT,mode:'index',intersect:false}},scales:{x:{ticks:{maxTicksLimit:5,font:{size:9},color:'#94A3B8'},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:'#94A3B8',maxTicksLimit:5},grid:{color:'#F1F5F9'},border:{display:false}}},interaction:{mode:'index',intersect:false}}
   });
 }
-function renderC6m(months,mo){
+
+function renderC6m(months,mo) {
   if(ci6m) ci6m.destroy();
-  ci6m=new Chart(document.getElementById('c6m'),{
+  ci6m = new Chart(document.getElementById('c6m'), {
     type:'bar',
-    data:{labels:months,datasets:CITIES.map(c=>({
-      label:c,data:mo[c],
-      backgroundColor:COL[c],
-      hoverBackgroundColor:COL[c]+'CC',
-      borderRadius:5,
-      borderSkipped:false
-    }))},
-    options:{
-      ...CHART_DEFAULTS,
-      plugins:{
-        legend:{display:false},
-        tooltip:{...TT}
-      },
-      scales:{
-        x:{
-          ticks:{font:{family:'Inter',size:9},color:'#94A3B8'},
-          grid:{display:false},
-          border:{display:false}
-        },
-        y:{
-          ticks:{font:{family:'Inter',size:9},color:'#94A3B8',maxTicksLimit:5,padding:6},
-          grid:{color:'#F1F5F9',drawTicks:false},
-          border:{display:false}
-        }
-      }
-    }
+    data:{labels:months,datasets:CITIES.map(c=>({label:c,data:mo[c],backgroundColor:COL[c],borderRadius:4,borderSkipped:false}))},
+    options:{...CD,plugins:{legend:{display:false},tooltip:{...TT}},scales:{x:{ticks:{font:{size:9},color:'#94A3B8'},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:'#94A3B8',maxTicksLimit:5},grid:{color:'#F1F5F9'},border:{display:false}}}}
   });
 }
 
 const COMP={
-  Cebu: [{n:'LOKALPAGE',v:72,us:true},{n:'Klook',v:95},{n:'Viator',v:88}],
-  Bohol:[{n:'LOKALPAGE',v:65,us:true},{n:'GetYourGuide',v:89},{n:'Airbnb',v:80}],
-  Bali: [{n:'LOKALPAGE',v:78,us:true},{n:'Klook',v:92},{n:'GYG',v:85}],
+  Cebu: [{n:'LOKALPAGE',v:9050,us:true,p:'₱9,050'},{n:'Treeshade',v:9200,p:'₱9,200'},{n:'Flex',v:8500,p:'₱8,500'}],
+  Bohol:[{n:'LOKALPAGE',v:3600,us:true,p:'₱3,600'},{n:'Boholtravel',v:3650,p:'₱3,650'},{n:'DFree',v:3650,p:'₱3,650'}],
+  Bali: [{n:'LOKALPAGE',v:1300,us:true,p:'Rp1,300'},{n:'Wayan',v:1237,p:'Rp1,237'},{n:'Apong',v:1122,p:'Rp1,122'}],
 };
-function renderComp(){
-  document.getElementById('compGrid').innerHTML=CITIES.map(c=>{
+function renderComp() {
+  document.getElementById('compGrid').innerHTML = CITIES.map(c => {
     const list=COMP[c], mx=Math.max(...list.map(x=>x.v));
-    return `
-    <div class="comp-block">
-      <div class="comp-city-head">
-        <div class="comp-dot" style="background:${COL[c]}"></div>
-        <span class="comp-city-name" style="color:${COL[c]}">${c}</span>
-      </div>
-      ${list.map(x=>`
-      <div class="comp-item">
-        <div class="comp-name-row">
-          <span class="comp-name${x.us?' us':''}">${x.n}${x.us?' ◆':''}</span>
-          <span class="comp-us-tag">${x.us?'ours':''}</span>
-        </div>
-        <div class="bar-bg">
-          <div class="bar-fill ${x.us?'bar-us':'bar-ot'}" data-w="${(x.v/mx*100).toFixed(0)}%"></div>
-        </div>
+    return `<div class="comp-block">
+      <div class="comp-city-head"><div class="comp-dot" style="background:${COL[c]}"></div><span class="comp-city-name" style="color:${COL[c]}">${c}</span></div>
+      ${list.map(x=>`<div class="comp-item">
+        <div class="comp-name-row"><span class="comp-name${x.us?' us':''}">${x.n}${x.us?' ◆':''}</span><span class="comp-tag">${x.p}</span></div>
+        <div class="bar-bg"><div class="bar-fill ${x.us?'bar-us':'bar-ot'}" data-w="${(x.v/mx*100).toFixed(0)}%"></div></div>
       </div>`).join('')}
     </div>`;
   }).join('');
@@ -895,7 +441,7 @@ function renderComp(){
   }));
 }
 
-function openModal(c){
+function openModal(c) {
   modalCity=c;
   document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`.ctab.${CLS[c]}`).classList.add('active');
@@ -903,7 +449,7 @@ function openModal(c){
   document.getElementById('negInput').value=rv[c].neg;
   document.getElementById('modalBg').classList.add('open');
 }
-function switchTab(c,btn){
+function switchTab(c,btn) {
   rv[modalCity].pos=document.getElementById('posInput').value.trim();
   rv[modalCity].neg=document.getElementById('negInput').value.trim();
   modalCity=c;
@@ -912,8 +458,7 @@ function switchTab(c,btn){
   document.getElementById('posInput').value=rv[c].pos;
   document.getElementById('negInput').value=rv[c].neg;
 }
-function closeModal(){ document.getElementById('modalBg').classList.remove('open'); }
-function handleBgClick(e){ if(e.target===document.getElementById('modalBg')) closeModal(); }
+function closeModal(){document.getElementById('modalBg').classList.remove('open')}
 function saveReviews(){
   rv[modalCity].pos=document.getElementById('posInput').value.trim();
   rv[modalCity].neg=document.getElementById('negInput').value.trim();
@@ -931,30 +476,26 @@ function toast(msg){
 async function doCapture(){
   toast('Saving…');
   try{
-    const c=await html2canvas(document.getElementById('theDash'),{scale:3,useCORS:true,backgroundColor:'#FFFFFF',logging:false});
+    const c=await html2canvas(document.getElementById('theDash'),{scale:3,useCORS:true,backgroundColor:'#F8F9FB',logging:false});
     c.toBlob(async blob=>{
-      try{
-        await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);
-        toast('Copied!');
-      } catch {
-        const a=document.createElement('a'); a.href=c.toDataURL();
-        a.download='lokalpage.png'; a.click(); toast('Saved!');
-      }
+      try{await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);toast('Copied!');}
+      catch{const a=document.createElement('a');a.href=c.toDataURL();a.download='lokalpage.png';a.click();toast('Saved!');}
     },'image/png');
-  } catch(e){ toast('Failed'); }
+  }catch{toast('Failed')}
 }
 
 async function loadData(manual=false){
   const ld=document.getElementById('loading');
   const ico=document.getElementById('rIco');
-  ld.classList.remove('out'); ico.classList.add('rspin');
+  ld.classList.remove('out');
+  ico.classList.add('rspin');
   try{
     let rows;
     try{
       const res=await fetch(GAS_URL,{redirect:'follow'});
       const raw=await res.json();
       rows=normalize(Array.isArray(raw)?raw:[]);
-    } catch {
+    }catch{
       rows=await new Promise((resolve,reject)=>{
         const cb='_cb'+Date.now();
         const s=document.createElement('script');
@@ -965,8 +506,7 @@ async function loadData(manual=false){
         document.head.appendChild(s);
       });
     }
-    if(!rows||rows.length===0){ rows=sample(); }
-    console.log('Data loaded:', rows.length, 'rows, sample:', rows.slice(-3));
+    if(!rows||rows.length===0) throw new Error('no data');
     const p=process(rows);
     lastStats=p.stats;
     renderCities(p.stats);
@@ -975,18 +515,15 @@ async function loadData(manual=false){
     renderC6m(p.months,p.mo);
     renderComp();
     const now=new Date();
-    document.getElementById('syncTime').textContent=
-      'DATE: '+now.toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'});
+    document.getElementById('syncTime').textContent='DATE: '+
+      now.toLocaleDateString('en-US',{year:'numeric',month:'2-digit',day:'2-digit'});
     if(manual) toast('Refreshed');
-  } catch(e){
+  }catch(e){
     console.error(e);
-    const p=process(sample());
-    lastStats=p.stats;
-    renderCities(p.stats); renderSum30(p.agg30);
-    renderC30(p.lbl30,p.d30); renderC6m(p.months,p.mo); renderComp();
-    toast('Using demo data');
-  } finally{
-    ld.classList.add('out'); ico.classList.remove('rspin');
+    toast('Sync failed');
+  }finally{
+    ld.classList.add('out');
+    ico.classList.remove('rspin');
   }
 }
 
