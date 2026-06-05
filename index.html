@@ -141,9 +141,7 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--t1);color:#fff;padding:8px 18px;border-radius:99px;font-size:12px;font-weight:600;opacity:0;transition:all .28s ease;z-index:999;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* FAB */
-.fab{position:fixed;bottom:24px;right:20px;width:38px;height:38px;border-radius:50%;background:var(--t1);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(0,0,0,.25);z-index:99}
-.fab svg{width:15px;height:15px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
 
 @media(min-width:600px){.page{max-width:520px}}
 @media(min-width:960px){.page{max-width:560px}}
@@ -160,9 +158,9 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
       <button class="ctab bali" onclick="switchTab('Bali',this)">Bali</button>
     </div>
     <label class="mlbl">↑ Top Feedback</label>
-    <textarea class="mta" id="posInput" placeholder="Best review this week…" rows="3"></textarea>
+    <textarea class="mta" id="posInput" placeholder="1. 리뷰 내용 입력&#10;2. 엔터 치면 번호 자동" rows="3" oninput="autoNumber(this)"></textarea>
     <label class="mlbl">↓ Key Complaint</label>
-    <textarea class="mta" id="negInput" placeholder="Review to address…" rows="3"></textarea>
+    <textarea class="mta" id="negInput" placeholder="1. 리뷰 내용 입력&#10;2. 엔터 치면 번호 자동" rows="3" oninput="autoNumber(this)"></textarea>
     <div class="mbtns">
       <button class="mb-cancel" onclick="closeModal()">Cancel</button>
       <button class="mb-save" onclick="saveReviews()">Save</button>
@@ -171,9 +169,7 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
 </div>
 
 <div class="toast" id="toast"></div>
-<button class="fab" onclick="doCapture()">
-  <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-</button>
+
 
 <div class="loading" id="loading">
   <div class="spinner"></div>
@@ -188,6 +184,12 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
     </div>
     <div class="hd-right">
       <div class="live-pill"><span class="live-dot"></span>Live</div>
+      <button class="rbtn" onclick="doCapture()" title="캡쳐">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </svg>
+      </button>
       <button class="rbtn" onclick="loadData(true)">
         <svg id="rIco" viewBox="0 0 24 24">
           <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
@@ -353,10 +355,10 @@ function renderCities(stats) {
   document.getElementById('cityCards').innerHTML = CITIES.map(c => {
     const s=stats[c], r=rv[c];
     const posHtml = r.pos
-      ? `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-text">"${r.pos}"</div>`
+      ? `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-text">${r.pos.split('\n').filter(l=>l.trim()).map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}</div>`
       : `<div class="rv-tag pos">↑ Top Feedback</div><div class="rv-empty">Tap to add</div>`;
     const negHtml = r.neg
-      ? `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-text">"${r.neg}"</div>`
+      ? `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-text">${r.neg.split('\n').filter(l=>l.trim()).map((l,i)=>`${i+1}. ${l.trim()}`).join('\n')}</div>`
       : `<div class="rv-tag neg">↓ Key Complaint</div><div class="rv-empty">Tap to add</div>`;
     return `
     <div class="cc ${CLS[c]}">
@@ -465,6 +467,21 @@ function saveReviews(){
   closeModal();
   if(lastStats) renderCities(lastStats);
   toast('Saved');
+}
+
+function autoNumber(el) {
+  const pos = el.selectionStart;
+  const lines = el.value.split('\n');
+  const numbered = lines.map((line, i) => {
+    // 이미 번호 있으면 유지, 없으면 추가
+    const clean = line.replace(/^\d+\.\s*/, '');
+    return clean ? `${i+1}. ${clean}` : '';
+  });
+  const newVal = numbered.join('\n');
+  if (newVal !== el.value) {
+    el.value = newVal;
+    el.selectionStart = el.selectionEnd = pos;
+  }
 }
 
 function toast(msg){
