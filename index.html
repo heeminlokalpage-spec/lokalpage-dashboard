@@ -201,12 +201,12 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
 
   <div class="content">
     <div class="sec">
-      <div class="sec-hd"><span class="sec-num">01</span><span class="sec-title">Last 7 Days</span></div>
+      <div class="sec-hd"><span class="sec-num">01</span><span class="sec-title">Last 7 Days</span><span id="range7" style="font-size:10px;font-weight:500;color:var(--t2);margin-left:6px"></span></div>
       <div class="city-cards" id="cityCards"></div>
     </div>
     <div class="hdiv"></div>
     <div class="sec">
-      <div class="sec-hd"><span class="sec-num">02</span><span class="sec-title">Last 30 Days</span></div>
+      <div class="sec-hd"><span class="sec-num">02</span><span class="sec-title">Last 30 Days</span><span id="range30" style="font-size:10px;font-weight:500;color:var(--t2);margin-left:6px"></span></div>
       <div class="chart-card">
         <div class="chart-top">
           <span class="chart-title">Daily Bookings</span>
@@ -314,6 +314,13 @@ function process(rows, reviewData) {
     return total > 0 ? Math.round(reviewed / total * 100) : 0;
   }
 
+  // 날짜 범위 UI용 전역 저장
+  window._ranges = {
+    w1s, w1e, w2s, w2e,
+    m1s: subDays(last,29), m1e: last,
+    m2s: subDays(last,59), m2e: subDays(last,30)
+  };
+
   const stats = {
     Cebu:  {bookings:sum(r7,'cebu_book'),  guests:sum(r7,'cebu_guest'),  rate:reviewRate('cebu'),  pb:sum(r7p,'cebu_book'),  pg:sum(r7p,'cebu_guest')},
     Bohol: {bookings:sum(r7,'bohol_book'), guests:sum(r7,'bohol_guest'), rate:reviewRate('bohol'), pb:sum(r7p,'bohol_book'), pg:sum(r7p,'bohol_guest')},
@@ -351,6 +358,22 @@ function process(rows, reviewData) {
   }
 
   return {stats, agg30, lbl30, d30, months, mo};
+}
+
+function fmtMD(ds) {
+  // "2026-05-22" → "05/22"
+  if(!ds) return '';
+  const parts = ds.split('-');
+  return parts[1] + '/' + parts[2];
+}
+
+function renderRanges() {
+  const r = window._ranges;
+  if(!r) return;
+  const r7El  = document.getElementById('range7');
+  const r30El = document.getElementById('range30');
+  if(r7El)  r7El.innerHTML  = `${fmtMD(r.w1s)}–${fmtMD(r.w1e)} <span style="color:var(--t3)">vs ${fmtMD(r.w2s)}–${fmtMD(r.w2e)}</span>`;
+  if(r30El) r30El.innerHTML = `${fmtMD(r.m1s)}–${fmtMD(r.m1e)} <span style="color:var(--t3)">vs ${fmtMD(r.m2s)}–${fmtMD(r.m2e)}</span>`;
 }
 
 function delta(c,p) {
@@ -631,6 +654,7 @@ async function loadData(manual=false){
     const p=process(rows.rows, rows.reviewData||{});
     lastStats=p.stats;
     renderCities(p.stats);
+    renderRanges();
     renderSum30(p.agg30);
     renderC30(p.lbl30,p.d30);
     renderC6m(p.months,p.mo);
