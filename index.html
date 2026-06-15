@@ -497,16 +497,14 @@ function openModal(c) {
   modalCity=c;
   document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`.ctab.${CLS[c]}`).classList.add('active');
-  const posVal = rv[c].pos;
-  const negVal = rv[c].neg;
-  document.getElementById('posInput').value = posVal || '1. ';
-  document.getElementById('negInput').value = negVal || '1. ';
-  // 커서를 끝으로
+  document.getElementById('posInput').value = rv[c].pos || '1. ';
+  document.getElementById('negInput').value = rv[c].neg || '1. ';
+  document.getElementById('modalBg').classList.add('open');
   setTimeout(() => {
     const p = document.getElementById('posInput');
+    p.focus();
     p.selectionStart = p.selectionEnd = p.value.length;
-  }, 50);
-  document.getElementById('modalBg').classList.add('open');
+  }, 100);
 }
 function switchTab(c,btn) {
   rv[modalCity].pos=document.getElementById('posInput').value.trim();
@@ -514,8 +512,8 @@ function switchTab(c,btn) {
   modalCity=c;
   document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('posInput').value=rv[c].pos;
-  document.getElementById('negInput').value=rv[c].neg;
+  document.getElementById('posInput').value = rv[c].pos || '1. ';
+  document.getElementById('negInput').value = rv[c].neg || '1. ';
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('open')}
 // Enter 키 시 다음 줄에 번호 자동 추가 (한글 IME 중복 방지)
