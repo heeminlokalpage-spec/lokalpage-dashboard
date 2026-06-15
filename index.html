@@ -158,9 +158,9 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
       <button class="ctab bali" onclick="switchTab('Bali',this)">Bali</button>
     </div>
     <label class="mlbl">↑ Top Feedback</label>
-    <textarea class="mta" id="posInput" placeholder="한 줄에 하나씩 입력하세요…" rows="3"></textarea>
+    <textarea class="mta" id="posInput" placeholder="한 줄에 하나씩 입력…" rows="3" onkeydown="handleEnter(event,this)"></textarea>
     <label class="mlbl">↓ Key Complaint</label>
-    <textarea class="mta" id="negInput" placeholder="한 줄에 하나씩 입력하세요…" rows="3"></textarea>
+    <textarea class="mta" id="negInput" placeholder="한 줄에 하나씩 입력…" rows="3" onkeydown="handleEnter(event,this)"></textarea>
     <div class="mbtns">
       <button class="mb-cancel" onclick="closeModal()">Cancel</button>
       <button class="mb-save" onclick="saveReviews()">Save</button>
@@ -486,8 +486,15 @@ function openModal(c) {
   modalCity=c;
   document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`.ctab.${CLS[c]}`).classList.add('active');
-  document.getElementById('posInput').value=rv[c].pos;
-  document.getElementById('negInput').value=rv[c].neg;
+  const posVal = rv[c].pos;
+  const negVal = rv[c].neg;
+  document.getElementById('posInput').value = posVal || '1. ';
+  document.getElementById('negInput').value = negVal || '1. ';
+  // 커서를 끝으로
+  setTimeout(() => {
+    const p = document.getElementById('posInput');
+    p.selectionStart = p.selectionEnd = p.value.length;
+  }, 50);
   document.getElementById('modalBg').classList.add('open');
 }
 function switchTab(c,btn) {
@@ -500,6 +507,20 @@ function switchTab(c,btn) {
   document.getElementById('negInput').value=rv[c].neg;
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('open')}
+// Enter 키 시 다음 줄에 번호 자동 추가 (한글 IME 중복 방지)
+function handleEnter(e, el) {
+  if (e.key !== 'Enter') return;
+  if (e.isComposing) return; // 한글 조합 중엔 무시
+  e.preventDefault();
+  const val = el.value;
+  const pos = el.selectionStart;
+  const lines = val.substring(0, pos).split('\n');
+  const nextNum = lines.length + 1;
+  const insert = '\n' + nextNum + '. ';
+  el.value = val.substring(0, pos) + insert + val.substring(pos);
+  el.selectionStart = el.selectionEnd = pos + insert.length;
+}
+
 function addNumbers(text) {
   return text.split('\n')
     .filter(l => l.trim())
@@ -581,7 +602,6 @@ async function loadData(manual=false){
 }
 
 loadData();
-setInterval(()=>loadData(),5*60*1000);
 </script>
 </body>
 </html>
