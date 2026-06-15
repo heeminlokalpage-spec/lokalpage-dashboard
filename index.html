@@ -607,13 +607,13 @@ async function loadData(manual=false){
     try{
       const res=await fetch(GAS_URL,{redirect:'follow'});
       const raw=await res.json();
-      rows=normalize(Array.isArray(raw)?raw:[]);
+      rows=normalize(raw);
     }catch{
       rows=await new Promise((resolve,reject)=>{
         const cb='_cb'+Date.now();
         const s=document.createElement('script');
         const t=setTimeout(()=>{reject(new Error('timeout'));s.remove();delete window[cb];},15000);
-        window[cb]=data=>{clearTimeout(t);delete window[cb];s.remove();resolve(normalize(Array.isArray(data)?data:[]));};
+        window[cb]=data=>{clearTimeout(t);delete window[cb];s.remove();resolve(normalize(data));};
         s.src=GAS_URL+'?callback='+cb;
         s.onerror=()=>{clearTimeout(t);reject(new Error('load'));};
         document.head.appendChild(s);
