@@ -314,13 +314,6 @@ function process(rows, reviewData) {
     return total > 0 ? Math.round(reviewed / total * 100) : 0;
   }
 
-  // 날짜 범위 UI용 전역 저장
-  window._ranges = {
-    w1s, w1e, w2s, w2e,
-    m1s: subDays(last,29), m1e: last,
-    m2s: subDays(last,59), m2e: subDays(last,30)
-  };
-
   const stats = {
     Cebu:  {bookings:sum(r7,'cebu_book'),  guests:sum(r7,'cebu_guest'),  rate:reviewRate('cebu'),  pb:sum(r7p,'cebu_book'),  pg:sum(r7p,'cebu_guest')},
     Bohol: {bookings:sum(r7,'bohol_book'), guests:sum(r7,'bohol_guest'), rate:reviewRate('bohol'), pb:sum(r7p,'bohol_book'), pg:sum(r7p,'bohol_guest')},
@@ -357,7 +350,10 @@ function process(rows, reviewData) {
     mo.Bali.push(mr.reduce((s,r)=>s+(r.bali_book||0),0));
   }
 
-  return {stats, agg30, lbl30, d30, months, mo};
+  return {stats, agg30, lbl30, d30, months, mo,
+    ranges: {w1s, w1e, w2s, w2e,
+      m1s: subDays(last,29), m1e: last,
+      m2s: subDays(last,59), m2e: subDays(last,30)}};
 }
 
 function fmtMD(ds) {
@@ -654,6 +650,7 @@ async function loadData(manual=false){
     const p=process(rows.rows, rows.reviewData||{});
     lastStats=p.stats;
     renderCities(p.stats);
+    window._ranges = p.ranges;
     renderRanges();
     renderSum30(p.agg30);
     renderC30(p.lbl30,p.d30);
