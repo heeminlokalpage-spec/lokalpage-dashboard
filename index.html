@@ -507,13 +507,17 @@ function openModal(c) {
   }, 100);
 }
 function switchTab(c,btn) {
-  rv[modalCity].pos=document.getElementById('posInput').value.trim();
-  rv[modalCity].neg=document.getElementById('negInput').value.trim();
-  modalCity=c;
+  // 현재 탭 내용 저장
+  rv[modalCity].pos = document.getElementById('posInput').value.trim();
+  rv[modalCity].neg = document.getElementById('negInput').value.trim();
+  modalCity = c;
   document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('posInput').value = rv[c].pos || '1. ';
-  document.getElementById('negInput').value = rv[c].neg || '1. ';
+  // 새 탭 내용 불러오기 (없으면 1. 으로 시작)
+  const pos = rv[c].pos;
+  const neg = rv[c].neg;
+  document.getElementById('posInput').value = pos && pos.trim() ? pos : '1. ';
+  document.getElementById('negInput').value = neg && neg.trim() ? neg : '1. ';
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('open')}
 // Enter 키 시 다음 줄에 번호 자동 추가 (한글 IME 중복 방지)
