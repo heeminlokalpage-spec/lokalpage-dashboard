@@ -348,7 +348,18 @@ function delta(c,p) {
   return `<div class="cc-delta ${cls}">${a}${d>0?'+':''}${d}</div>`;
 }
 
-const rv={Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}};
+// localStorage에서 저장된 리뷰 불러오기
+function loadRv() {
+  try {
+    const saved = localStorage.getItem('lp_reviews');
+    return saved ? JSON.parse(saved) : {Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}};
+  } catch { return {Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}}; }
+}
+function saveRv() {
+  try { localStorage.setItem('lp_reviews', JSON.stringify(rv)); } catch {}
+}
+
+const rv = loadRv();
 let modalCity='Cebu', lastStats=null;
 
 function renderCities(stats) {
@@ -536,6 +547,7 @@ function addNumbers(text) {
 function saveReviews(){
   rv[modalCity].pos = addNumbers(document.getElementById('posInput').value);
   rv[modalCity].neg = addNumbers(document.getElementById('negInput').value);
+  saveRv(); // localStorage에 저장
   closeModal();
   if(lastStats) renderCities(lastStats);
   toast('Saved');
@@ -563,6 +575,11 @@ async function loadData(manual=false){
   const ico=document.getElementById('rIco');
   ld.classList.remove('out');
   ico.classList.add('rspin');
+  // 수동 새로고침 시 리뷰 초기화
+  if(manual){
+    CITIES.forEach(c=>{rv[c].pos='';rv[c].neg='';});
+    saveRv();
+  }
   try{
     let rows;
     try{
