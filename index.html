@@ -261,8 +261,11 @@ function subDays(dateStr, n) {
 }
 
 function normalize(raw) {
-  // 새 구조: {rows: [...], reviewData: {...}}
-  const rows = (raw.rows || raw).filter(r => r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date))
+  if(!raw) return {rows:[], reviewData:{}};
+  // raw가 배열이면 이전 구조, 객체면 새 구조
+  const dataRows = Array.isArray(raw) ? raw : (raw.rows || []);
+  const reviewData = raw.reviewData || {};
+  const rows = dataRows.filter(r => r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date))
     .map(r => ({
       date:       r.date,
       cebu_book:  Number(r.cebu_book) ||0,
@@ -272,7 +275,7 @@ function normalize(raw) {
       bohol_book: Number(r.bohol_book)||0,
       bohol_guest:Number(r.bohol_guest)||0,
     }));
-  return { rows, reviewData: raw.reviewData || {} };
+  return { rows, reviewData };
 }
 
 function process(rows, reviewData) {
@@ -607,18 +610,23 @@ async function loadData(manual=false){
     try{
       const res=await fetch(GAS_URL,{redirect:'follow'});
       const raw=await res.json();
+      // raw가 {rows,reviewData} 객체이거나 배열일 수 있음
       rows=normalize(raw);
-    }catch{
+    }catch(fetchErr){
       rows=await new Promise((resolve,reject)=>{
         const cb='_cb'+Date.now();
         const s=document.createElement('script');
         const t=setTimeout(()=>{reject(new Error('timeout'));s.remove();delete window[cb];},15000);
-        window[cb]=data=>{clearTimeout(t);delete window[cb];s.remove();resolve(normalize(data));};
+        window[cb]=data=>{
+          clearTimeout(t);delete window[cb];s.remove();
+          resolve(normalize(data));
+        };
         s.src=GAS_URL+'?callback='+cb;
         s.onerror=()=>{clearTimeout(t);reject(new Error('load'));};
         document.head.appendChild(s);
       });
     }
+    console.log('rows result:', rows);
     if(!rows||!rows.rows||rows.rows.length===0) throw new Error('no data');
     const p=process(rows.rows, rows.reviewData||{});
     lastStats=p.stats;
