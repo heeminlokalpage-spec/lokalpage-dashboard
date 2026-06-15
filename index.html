@@ -350,10 +350,19 @@ function delta(c,p) {
 
 // localStorage에서 저장된 리뷰 불러오기
 function loadRv() {
+  const def = {Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}};
   try {
     const saved = localStorage.getItem('lp_reviews');
-    return saved ? JSON.parse(saved) : {Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}};
-  } catch { return {Cebu:{pos:'',neg:''},Bohol:{pos:'',neg:''},Bali:{pos:'',neg:''}}; }
+    if (!saved) return def;
+    const parsed = JSON.parse(saved);
+    // 각 도시 기본값 보장
+    ['Cebu','Bohol','Bali'].forEach(c => {
+      if (!parsed[c]) parsed[c] = {pos:'',neg:''};
+      if (parsed[c].pos === undefined) parsed[c].pos = '';
+      if (parsed[c].neg === undefined) parsed[c].neg = '';
+    });
+    return parsed;
+  } catch { return def; }
 }
 function saveRv() {
   try { localStorage.setItem('lp_reviews', JSON.stringify(rv)); } catch {}
@@ -497,8 +506,10 @@ function openModal(c) {
   modalCity=c;
   document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`.ctab.${CLS[c]}`).classList.add('active');
-  document.getElementById('posInput').value = rv[c].pos || '1. ';
-  document.getElementById('negInput').value = rv[c].neg || '1. ';
+  const _pos = (rv[c] && rv[c].pos) ? rv[c].pos.trim() : '';
+  const _neg = (rv[c] && rv[c].neg) ? rv[c].neg.trim() : '';
+  document.getElementById('posInput').value = _pos || '1. ';
+  document.getElementById('negInput').value = _neg || '1. ';
   document.getElementById('modalBg').classList.add('open');
   setTimeout(() => {
     const p = document.getElementById('posInput');
@@ -514,10 +525,10 @@ function switchTab(c,btn) {
   document.querySelectorAll('.ctab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
   // 새 탭 내용 불러오기 (없으면 1. 으로 시작)
-  const pos = rv[c].pos;
-  const neg = rv[c].neg;
-  document.getElementById('posInput').value = pos && pos.trim() ? pos : '1. ';
-  document.getElementById('negInput').value = neg && neg.trim() ? neg : '1. ';
+  const pos = (rv[c] && rv[c].pos) ? rv[c].pos.trim() : '';
+  const neg = (rv[c] && rv[c].neg) ? rv[c].neg.trim() : '';
+  document.getElementById('posInput').value = pos || '1. ';
+  document.getElementById('negInput').value = neg || '1. ';
 }
 function closeModal(){document.getElementById('modalBg').classList.remove('open')}
 // Enter 키 시 다음 줄에 번호 자동 추가 (한글 IME 중복 방지)
