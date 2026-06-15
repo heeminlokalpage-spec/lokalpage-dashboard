@@ -245,7 +245,7 @@ html,body{background:var(--bg);font-family:'Inter',system-ui,sans-serif;color:va
 </div>
 
 <script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzzlU7N1xBkcI76HllFkYbPvbnEwmCTUa99kjyRpc4wz0xYUpmLvaKukL3L9tqtP310qA/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzPLhAk3CADHw-pTpQ9VIKwvMTFnR1CJaUWdhB-yTjYaOLf-p72qn0u4pP1Xg1x4Lg-4g/exec";
 const CITIES = ['Cebu','Bohol','Bali'];
 const COL = {Cebu:'#2563EB',Bohol:'#16A34A',Bali:'#EA580C'};
 const CLS = {Cebu:'cebu',Bohol:'bohol',Bali:'bali'};
@@ -261,23 +261,21 @@ function subDays(dateStr, n) {
 }
 
 function normalize(raw) {
-  return raw
-    .filter(r => r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date))
+  // 새 구조: {rows: [...], reviewData: {...}}
+  const rows = (raw.rows || raw).filter(r => r.date && /^\d{4}-\d{2}-\d{2}$/.test(r.date))
     .map(r => ({
-      date:         r.date,
-      cebu_book:    Number(r.cebu_book)  ||0,
-      cebu_guest:   Number(r.cebu_guest) ||0,
-      cebu_review:  Number(r.cebu_review)||0,
-      bali_book:    Number(r.bali_book)  ||0,
-      bali_guest:   Number(r.bali_guest) ||0,
-      bali_review:  Number(r.bali_review)||0,
-      bohol_book:   Number(r.bohol_book) ||0,
-      bohol_guest:  Number(r.bohol_guest)||0,
-      bohol_review: Number(r.bohol_review)||0,
+      date:       r.date,
+      cebu_book:  Number(r.cebu_book) ||0,
+      cebu_guest: Number(r.cebu_guest)||0,
+      bali_book:  Number(r.bali_book) ||0,
+      bali_guest: Number(r.bali_guest)||0,
+      bohol_book: Number(r.bohol_book)||0,
+      bohol_guest:Number(r.bohol_guest)||0,
     }));
+  return { rows, reviewData: raw.reviewData || {} };
 }
 
-function process(rows) {
+function process(rows, reviewData) {
   // 데이터의 마지막 날짜 기준
   const sorted = rows.map(r=>r.date).sort();
   const last = sorted[sorted.length-1]; // 예: 2026-05-28
@@ -302,10 +300,21 @@ function process(rows) {
   const r30  = rng(m1s, w1e);
   const r30p = rng(m2s, m2e);
 
+  // 리뷰레이트: start_date 기준 1~7일전, LOKALPAGE 채널만
+  function reviewRate(city) {
+    let total = 0, reviewed = 0;
+    for (let i = 0; i < 7; i++) {
+      const ds = subDays(last, i + 1); // 어제~7일전
+      const d = reviewData[ds] && reviewData[ds][city];
+      if (d) { total += d.total; reviewed += d.reviewed; }
+    }
+    return total > 0 ? Math.round(reviewed / total * 100) : 0;
+  }
+
   const stats = {
-    Cebu:  {bookings:sum(r7,'cebu_book'),  guests:sum(r7,'cebu_guest'),  rate:pct(sum(r7,'cebu_review'), sum(r7,'cebu_book')),  pb:sum(r7p,'cebu_book'),  pg:sum(r7p,'cebu_guest')},
-    Bohol: {bookings:sum(r7,'bohol_book'), guests:sum(r7,'bohol_guest'), rate:pct(sum(r7,'bohol_review'),sum(r7,'bohol_book')), pb:sum(r7p,'bohol_book'), pg:sum(r7p,'bohol_guest')},
-    Bali:  {bookings:sum(r7,'bali_book'),  guests:sum(r7,'bali_guest'),  rate:pct(sum(r7,'bali_review'), sum(r7,'bali_book')),  pb:sum(r7p,'bali_book'),  pg:sum(r7p,'bali_guest')},
+    Cebu:  {bookings:sum(r7,'cebu_book'),  guests:sum(r7,'cebu_guest'),  rate:reviewRate('cebu'),  pb:sum(r7p,'cebu_book'),  pg:sum(r7p,'cebu_guest')},
+    Bohol: {bookings:sum(r7,'bohol_book'), guests:sum(r7,'bohol_guest'), rate:reviewRate('bohol'), pb:sum(r7p,'bohol_book'), pg:sum(r7p,'bohol_guest')},
+    Bali:  {bookings:sum(r7,'bali_book'),  guests:sum(r7,'bali_guest'),  rate:reviewRate('bali'),  pb:sum(r7p,'bali_book'),  pg:sum(r7p,'bali_guest')},
   };
 
   const agg30 = {
@@ -610,8 +619,8 @@ async function loadData(manual=false){
         document.head.appendChild(s);
       });
     }
-    if(!rows||rows.length===0) throw new Error('no data');
-    const p=process(rows);
+    if(!rows||!rows.rows||rows.rows.length===0) throw new Error('no data');
+    const p=process(rows.rows, rows.reviewData||{});
     lastStats=p.stats;
     renderCities(p.stats);
     renderSum30(p.agg30);
